@@ -1,0 +1,160 @@
+body {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    margin: 40px 9%;
+    line-height: 1.35;
+}
+
+.judul {
+    width: fit-content;
+    margin: 0 auto;
+    background-color: cyan;
+    font-weight: bold;
+    text-align: center;
+}
+
+.pembukaan {
+    width: fit-content;
+    margin: 0 auto 25px auto;
+    background-color: blue;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+.paragraf {
+    text-align: justify;
+    margin: 0 0 18px 0;
+}
+
+.paragraf.pertama {
+    border: 2px solid red;
+    padding: 6px;
+}
+
+.highlight-green {
+    background-color: lime;
+}
+
+.highlight-yellow {
+    background-color: yellow;
+}
+
+.paragraf strong {
+    color: blue;
+    font-weight: bold;
+}
+
+.italic-underline {
+    font-style: italic;
+    text-decoration: underline;
+}
+
+.sumber {
+    font-weight : bold;  
+}
+
+.klik {
+    color : blue !important;
+    font-style : italic !important;
+    font-weight: normal !important;
+    text-decoration : underline !important;
+}
+
+.klik:hover {
+    color: red !important;
+    font-style: italic !important;
+    font-weight: normal !important;
+    text-decoration : underline !important;
+
+}
+
+.sumber::after{
+    content : "jika dihover jadi warna merah";
+    color : #808080;
+    font-style : italic;
+    text-decoration : none;
+    font-weight : normal;
+}
+
+.link-ke,
+.url {
+    display: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 15px 0;
+}
+
+.hover-info {
+    color : #808080;
+    font-style: italic;
+}
+
+a {
+    color: blue;
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+.negara{
+    color: blue;
+    font-weight: bold;
+}
+
+
+.url {
+    color: blue;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+
+td {
+    border: 2px solid #555;
+    height: 25px;
+    padding: 3px 8px;
+    color: red;
+    font-weight: bold;
+}
+
+.pancasila {
+    width: fit-content;
+    margin: 0 auto;
+    background-color: cyan;
+    font-weight: bold;
+    text-align: center;
+}
+
+li {
+    width: fit-content;
+    background-color: yellow;
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+ol {
+    list-style: none;
+    counter-reset: nomor;
+    padding-left: 0;
+}
+
+ol li {
+    counter-increment: nomor;
+    display: flex;
+    align-items: flex-start;
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+ol li::before {
+    content: counter(nomor) ".";
+    background-color: yellow;
+    margin-right: 5px;
+    flex-shrink: 0;
+}

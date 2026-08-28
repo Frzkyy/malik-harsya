@@ -1,0 +1,107 @@
+
+body {
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    margin: 25px 22%;
+    color: black;
+}
+
+h1 {
+    font-size: 22px;
+    text-align: center;
+    margin: 0 0 18px 0;
+}
+
+.judul {
+    background-color: aqua;
+    display: table;
+    margin: 0 auto 4px auto;
+    font-size: 22px;
+}
+
+#pembukaan {
+    background-color: blue;
+    color: white;
+    display: table;
+    margin: 0 auto 60px auto;
+    font-size: 22px;
+}
+
+p {
+    margin: 0 0 25px 0;
+    text-align: justify;
+}
+
+#border {
+    border: 1px solid red;
+    padding: 8px;
+}
+
+.highlight-green {
+    background-color: #00ff00;
+}
+
+.highlight-yellow {
+    background-color: yellow;
+}
+
+.highlight-blue {
+    color: blue;
+    font-weight: bold;
+}
+
+.highlight-italic {
+    font-style: italic;
+    text-decoration: underline;
+}
+
+.source {
+    font-weight: bold;
+    color: black;
+    text-align: left;
+}
+
+.source a {
+    color: blue;
+    font-style: italic;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.source a:hover {
+    color: red;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0 25px 0;
+}
+
+td {
+    border: 1px solid black;
+    height: 40px;
+    padding: 4px 8px;
+    color: red;
+    font-weight: bold;
+    text-align: left;
+    vertical-align: middle;
+}
+
+
+ol {
+    margin-top: 0;
+    padding-left: 35px;
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+.sila {
+    background-color: yellow;
+    display: inline;
+    width: fit-content;
+    padding: 0 3px;
+    margin-bottom: 4px;
+}
+
