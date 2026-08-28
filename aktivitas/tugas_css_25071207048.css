@@ -4,8 +4,117 @@
      box-sizing: border-box;
 }
 
+#main-text {
+     text-align: justify;
+}
+
+#main-text p {
+     margin: 30px 0;
+}
+
+#main-text a:hover {
+     color: red;
+}
+
 #wrapper {
-     background-color: antiquewhite;
-     max-width: 1500px;
+     padding: 10px;
      margin: auto;
+
+     max-width: 1000px;
+     align-items: center;
+}
+
+#judul {
+     margin: 10px;
+     text-align: center;
+}
+
+#tabel {
+     border: 1px solid black;
+     border-collapse: collapse;
+}
+
+#tabel td{
+     padding: 3px;
+
+     color: red;
+     font-weight: bold;
+     border: 1px solid black;
+}
+
+#pancasila-judul {
+     font-weight: bold;
+     background-color: aqua;
+}
+
+#point-pancasila {
+     padding: 10px;
+     padding-left: 50px;
+}
+#point-pancasila ol {
+     list-style: none;
+     counter-reset: angka;
+     padding: 0;
+}
+
+#point-pancasila li {
+     counter-increment: angka;
+     font-weight: bold;
+     font-style: italic;
+     text-decoration: underline;
+     width: fit-content;
+     background-color: yellow;
+}
+
+#point-pancasila li::before {
+     content: counter(angka) ". ";
+     background-color: yellow;
+}
+
+.latar-biru-muda {
+     background-color: aqua;
+}
+
+.latar-biru-tua {
+     background-color: blue;
+}
+
+.teks-putih {
+     color: white;
+}
+
+.latar-hijau-muda {
+     background-color:lime;
+}
+
+.latar-kuning {
+     background-color: yellow;
+}
+
+.italic-underline {
+     font-style: italic;
+     text-decoration: underline;
+}
+
+.bold {
+     font-weight: bold;
+}
+
+.bold-biru-tua {
+     font-weight: bold;
+     color: blue;
+}
+
+.text-center {
+     margin-top: 20px;
+     text-align: center;
+}
+
+.border-merah {
+     border: 2px solid red;
+     padding: 10px;
+}
+
+#main-text .border-merah p {
+     margin: 0;
 }
