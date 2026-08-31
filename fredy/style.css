@@ -22,6 +22,7 @@
 
 /* =========================================================
    VARIABEL WARNA (TEMA GELAP)
+   Aktif ketika body memiliki atribut data-theme="dark"
    ========================================================= */
 body[data-theme="dark"] {
   --bg-color: #121417;
@@ -114,7 +115,7 @@ body {
 }
 
 /* =========================================================
-   LAYOUT UTAMA
+   CONTAINER / LAYOUT UTAMA
    ========================================================= */
 .container {
   max-width: 640px;
@@ -156,13 +157,28 @@ body {
   gap: 4px;
 }
 
+/* Kondisi default: menampilkan logo universitas.
+   Dibuat kotak membulat (bukan lingkaran) dan tanpa border,
+   supaya logo tidak terpotong oleh bentuk lingkaran. */
 .profile-photo {
   width: 100px;
   height: 100px;
+  border-radius: 14px;
+  object-fit: contain;
+  background-color: #ffffff;
+  padding: 6px;
+  border: none;
+  margin-bottom: 10px;
+}
+
+/* Kondisi setelah pengguna mengunggah foto sendiri:
+   baru dibuat bulat penuh dan diberi border aksen. */
+.profile-photo.has-photo {
   border-radius: 50%;
   object-fit: cover;
+  background-color: transparent;
+  padding: 0;
   border: 3px solid var(--accent-color);
-  margin-bottom: 10px;
 }
 
 .profile-name {
@@ -177,7 +193,7 @@ body {
 }
 
 /* =========================================================
-   TOMBOL PENGHITUNG
+   COUNTER & TOMBOL PENGHITUNG
    ========================================================= */
 .counter-card p {
   font-size: 1rem;
@@ -272,7 +288,7 @@ body {
   cursor: pointer;
 }
 
-/* Style saat input dianggap tidak valid */
+/* Style saat input dianggap tidak valid (ditambahkan lewat JS) */
 .form-group input.invalid,
 .form-group textarea.invalid {
   border-color: var(--error-color);
@@ -286,7 +302,7 @@ body {
   min-height: 20px;
 }
 
-/* Saat pesan menandakan sukses */
+/* Saat pesan menandakan sukses (class ditambahkan lewat JS) */
 .form-error.success {
   color: var(--accent-color);
 }

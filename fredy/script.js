@@ -1,21 +1,23 @@
 // =========================================================
-// TOMBOL PENGHITUNG
+// FITUR 1: TOMBOL PENGHITUNG (COUNTER)
 // =========================================================
 
+// Ambil elemen yang dibutuhkan dari HTML
 const counterValue = document.getElementById('counterValue');
 const counterButton = document.getElementById('counterButton');
 
 // Simpan nilai counter di dalam variabel (state)
 let count = 0;
 
+// Tambahkan event listener pada tombol (bukan inline onclick)
 counterButton.addEventListener('click', function () {
-  count = count + 1;
-  counterValue.textContent = count;
+  count = count + 1; // tambah 1 setiap kali diklik
+  counterValue.textContent = count; // perbarui tampilan angka di halaman
 });
 
 
 // =========================================================
-// VALIDASI FORM DATA MAHASISWA
+// FITUR 2: VALIDASI FORM DATA MAHASISWA
 // =========================================================
 
 // Ambil elemen form dan input-inputnya
@@ -48,7 +50,9 @@ function tampilkanError(pesan, inputBermasalah) {
   }
 }
 
+// Tambahkan event listener pada saat form disubmit
 contactForm.addEventListener('submit', function (event) {
+  // Mencegah form mengirim data ke server (karena tidak ada backend)
   event.preventDefault();
 
   // Reset pesan dan tanda invalid setiap kali submit dicoba
@@ -83,7 +87,7 @@ contactForm.addEventListener('submit', function (event) {
     return;
   }
 
-  // 2 digit pertama = tahun masuk
+  // 2 digit pertama = tahun masuk (00 - 26, karena tahun berjalan adalah 2026)
   const tahunMasuk = parseInt(nimValue.substring(0, 2), 10);
   if (tahunMasuk < 0 || tahunMasuk > 26) {
     tampilkanError('2 digit pertama NIM (tahun masuk) tidak valid. Contoh: 26 untuk angkatan 2026.', nimInput);
@@ -113,10 +117,13 @@ contactForm.addEventListener('submit', function (event) {
   formError.textContent = 'Form berhasil dikirim. Kartu mahasiswa telah diperbarui!';
 
   // Perbarui kartu mahasiswa dengan data yang baru disubmit.
+  // Bullet (•) ditulis langsung sebagai teks, digabung memakai textContent
+  // agar lebih aman daripada innerHTML.
   profileName.textContent = namaValue;
   profileRole.textContent = nimValue + ' \u2022 ' + jurusanValue;
 
-  // Foto profil, bersifat opsional.
+  // Foto profil bersifat opsional. Jika pengguna memilih file gambar,
+  // baca isinya dengan FileReader lalu tampilkan sebagai foto profil.
   const fileFoto = fotoProfilInput.files[0];
 
   if (fileFoto) {
@@ -125,10 +132,14 @@ contactForm.addEventListener('submit', function (event) {
     // Fungsi ini dijalankan setelah gambar selesai dibaca
     pembaca.onload = function (e) {
       profilePhoto.src = e.target.result;
+      // Tandai bahwa ini foto asli pengguna, supaya tampil bulat + berborder
+      profilePhoto.classList.add('has-photo');
     };
 
     pembaca.readAsDataURL(fileFoto);
   }
+  // Jika tidak ada file yang dipilih, foto profil dibiarkan seperti sebelumnya
+  // (tidak diubah, dan gaya border-nya juga tidak diubah)
 
   // Kosongkan kembali form setelah berhasil "dikirim"
   contactForm.reset();
@@ -136,7 +147,7 @@ contactForm.addEventListener('submit', function (event) {
 
 
 // =========================================================
-// UCAPAN DINAMIS BERDASARKAN WAKTU
+// FITUR 3: UCAPAN DINAMIS BERDASARKAN WAKTU
 // =========================================================
 
 const greetingElement = document.getElementById('greeting');
@@ -151,7 +162,7 @@ function tampilkanUcapan() {
     ucapan = 'Selamat Pagi';
   } else if (jam >= 11 && jam <= 14) {
     ucapan = 'Selamat Siang';
-  } else if (jam >= 15 && jam <= 18) {
+  } else if (jam >= 15 && jam <= 17) {
     ucapan = 'Selamat Sore';
   } else {
     ucapan = 'Selamat Malam';
@@ -162,7 +173,7 @@ function tampilkanUcapan() {
 
 
 // =========================================================
-// TOMBOL SETTING TEMA GELAP/TERANG
+// FITUR TAMBAHAN: TOMBOL SETTING TEMA GELAP/TERANG
 // =========================================================
 
 const themeToggle = document.getElementById('themeToggle');
