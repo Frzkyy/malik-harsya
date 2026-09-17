@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITEI | Universitas Riau</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/purecss@3.0.0/build/pure-min.css">
+    <link rel="stylesheet" href="tugas_framework_css_25071101303.css">
+</head>
+
+<body>
+
+    <div class="login-card pure-g">
+
+        <div class="image-panel pure-u-2-3">
+            <img
+                src="gambar_depan.jpg"
+                alt="Slideshow SITEI Teknik Elektro dan Informatika"
+            >
+        </div>
+
+        <div class="login-panel pure-u-1-3">
+            <div class="login-content">
+
+                <div class="brand pure-g">
+                    <div class="logo pure-u-1-4">
+                        <img src="unri.png" alt="Logo Universitas Riau">
+                    </div>
+
+                    <div class="brand-title pure-u-3-4">
+                        <h1>
+                            Sistem Informasi<br>
+                            Teknik Elektro &amp;<br>
+                            Informatika
+                        </h1>
+                    </div>
+                </div>
+
+                <form class="pure-form pure-form-stacked">
+
+                    <label for="username">
+                        Username <span>*</span>
+                    </label>
+
+                    <input
+                        id="username"
+                        type="text"
+                        placeholder="Username"
+                        class="pure-input-1"
+                    >
+
+                    <label for="password">
+                        Password <span>*</span>
+                    </label>
+
+                    <div class="password-box">
+                        <input
+                            id="password"
+                            type="password"
+                            placeholder="Password"
+                            class="pure-input-1"
+                        >
+
+                        <button
+                            type="button"
+                            id="togglePassword"
+                            class="pure-button password-toggle"
+                            aria-label="Tampilkan password"
+                        >◌</button>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="pure-button pure-button-primary masuk"
+                    >
+                        Masuk
+                    </button>
+
+                </form>
+
+                <p class="help-text">
+                    Belum Punya Akun atau Lupa Password
+                    <span>(Hubungi Admin Prodi)</span>
+                </p>
+
+                <hr>
+
+                <footer>
+                    <small>Dikembangkan oleh:</small>
+                    <a href="#" class="developer">
+                        TIM PRODI TEKNIK INFORMATIKA
+                    </a>
+                    <small class="copyright">
+                        2026 © SITEI JTE UNRI
+                    </small>
+                </footer>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const togglePassword = document.getElementById("togglePassword");
+        const password = document.getElementById("password");
+
+        togglePassword.addEventListener("click", function () {
+            if (password.type === "password") {
+                password.type = "text";
+                togglePassword.textContent = "◉";
+            } else {
+                password.type = "password";
+                togglePassword.textContent = "◌";
+            }
+        });
+    </script>
+
+</body>
+</html>
