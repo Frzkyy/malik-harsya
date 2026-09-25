@@ -1,0 +1,32 @@
+* {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+}
+
+#perkenalan-pengantin {
+     font-size: 40px;
+     font-family: "Great Vibes", cursive;
+     text-align: center;
+}
+
+#inner-perkenalan-pengantin {
+     font-weight: bold;
+     font-family: "Great Vibes", cursive;
+     display: flex;
+     justify-content: space-around;
+
+}
+
+.foto-perkenalan-pengantin {
+     max-width: 700px;
+     text-align: center;
+}
+
+.foto-perkenalan-pengantin img {
+     max-width: 300px;
+}
+
+.font-foto-mempelai {
+     font-size: 60px;
+}
