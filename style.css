@@ -400,7 +400,7 @@ body {
      margin: auto;
 
      font-family: "Cormorant Garamond", serif;
-     font-size: clamp(17px, 1.5vw, 21px);
+     font-size: clamp(22px, 2vw, 30px);
      font-weight: 600;
      line-height: 1.4;
 }
@@ -449,6 +449,542 @@ body {
           height: 220px;
 
           margin: 0 auto;
+     }
+
+}
+
+/*================================================*/
+/* LOKASI ACARA */
+/*================================================*/
+
+#lokasi-acara {
+     width: 100%;
+     padding: 25px 3% 40px;
+
+     background-color: #fffbee;
+}
+
+/* JUDUL */
+
+#lokasi-acara > h1 {
+     margin: 0 0 35px;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: clamp(42px, 4vw, 50px);
+     font-weight: 700;
+
+     text-align: center;
+}
+
+/*================================================*/
+/* ALAMAT */
+/*================================================*/
+
+#alamat {
+     width: 95%;
+     margin: auto;
+
+     display: flex;
+     align-items: center;
+}
+
+/* TEKS */
+
+#alamat > div:first-child {
+     width: 40%;
+     padding: 0 25px;
+}
+
+#alamat h2 {
+     margin: 0 0 5px;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: clamp(30px, 3vw, 38px);
+     font-weight: 700;
+}
+
+#alamat p {
+     margin: 0 0 30px;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: clamp(20px, 1.8vw, 23px);
+     font-weight: 600;
+     line-height: 1.4;
+}
+
+/* GAMBAR */
+
+#alamat > div:last-child {
+     width: 60%;
+}
+
+#alamat img {
+     display: block;
+
+     width: 100%;
+     height: auto;
+
+     object-fit: cover;
+}
+
+/*================================================*/
+/* BUTTON */
+/*================================================*/
+
+#alamat button {
+     width: 135px;
+     height: 50px;
+
+     border: none;
+     border-radius: 30px;
+
+     background-color: #b89555;
+     color: white;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: 19px;
+     font-weight: 600;
+}
+
+/*================================================*/
+/* GALERI */
+/*================================================*/
+
+#galeri {
+     width: 100%;
+     padding: 60px 4% 80px;
+
+     background-color: #fffbee;
+
+     text-align: center;
+}
+
+/* JUDUL */
+
+#galeri > h1 {
+     margin: 0 0 40px;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: clamp(42px, 4vw, 52px);
+     font-weight: 700;
+
+     color: #111;
+}
+
+/*================================================*/
+/* KUMPULAN FOTO */
+/*================================================*/
+
+#galeri > div {
+     width: 100%;
+     max-width: 1200px;
+     margin: auto;
+
+     display: grid;
+     grid-template-columns: 1fr 1fr;
+     grid-template-rows: 280px 280px;
+
+     gap: 15px;
+}
+
+/* FOTO */
+
+#galeri img {
+     width: 100%;
+     height: 100%;
+
+     display: block;
+
+     object-fit: cover;
+
+     border-radius: 8px;
+}
+
+/* FOTO PERTAMA */
+
+#galeri img:nth-child(1) {
+     grid-row: 1 / 3;
+}
+
+/*================================================*/
+/* RESPONSIVE */
+/*================================================*/
+
+@media (max-width: 700px) {
+
+     #galeri {
+          padding: 45px 5% 60px;
+     }
+
+     #galeri > div {
+          grid-template-columns: 1fr;
+          grid-template-rows: repeat(3, 250px);
+
+          gap: 15px;
+     }
+
+     #galeri img:nth-child(1) {
+          grid-row: auto;
+     }
+
+}
+
+/*================================================*/
+/* STORY */
+/*================================================*/
+
+#story {
+     width: 100%;
+     padding: 60px 0 100px;
+     background-color: #fffbee;
+     text-align: center;
+}
+
+
+/*================================================*/
+/* JUDUL STORY */
+/*================================================*/
+
+#story > h1 {
+     margin: 0;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: clamp(42px, 4vw, 52px);
+     font-weight: 700;
+
+     color: #111;
+}
+
+
+/*================================================*/
+/* ORNAMEN */
+/*================================================*/
+
+#story > .ornamen-story {
+     display: block;
+
+     width: 200px;
+     max-width: 35%;
+
+     margin: 10px auto 25px;
+}
+
+
+/*================================================*/
+/* DESKRIPSI */
+/*================================================*/
+
+#story > h2 {
+     width: 80%;
+     max-width: 900px;
+
+     margin: 0 auto 60px;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: clamp(20px, 1.8vw, 26px);
+     font-weight: 600;
+     line-height: 1.4;
+
+     color: #3d3429;
+}
+
+
+/*================================================*/
+/* BLOK CERITA */
+/*================================================*/
+
+.cerita {
+     width: 90%;
+     margin: 0 auto;
+
+     display: flex;
+     align-items: center;
+}
+
+
+/*================================================*/
+/* TEKS */
+/*================================================*/
+
+.cerita-text {
+     width: 50%;
+     padding: 0 45px;
+
+     text-align: left;
+}
+
+.cerita-text h3 {
+     margin: 0 0 8px;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: clamp(25px, 2.3vw, 32px);
+     font-weight: 700;
+
+     color: #111;
+}
+
+.cerita-text p {
+     margin: 0;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: clamp(18px, 1.5vw, 22px);
+     font-weight: 600;
+     line-height: 1.4;
+
+     color: #3d3429;
+}
+
+
+/*================================================*/
+/* GAMBAR */
+/*================================================*/
+
+.cerita > img {
+     width: 50%;
+     height: auto;
+
+     display: block;
+
+     border-radius: 8px;
+}
+
+
+/*================================================*/
+/* JARAK ANTAR CERITA */
+/*================================================*/
+
+.cerita + .cerita {
+     margin-top: 30px;
+}
+
+
+/*================================================*/
+/* CERITA KIRI */
+/*================================================*/
+
+.cerita-kiri .cerita-text {
+     order: 1;
+}
+
+.cerita-kiri > img {
+     order: 2;
+}
+
+
+/*================================================*/
+/* CERITA KANAN */
+/*================================================*/
+
+.cerita-kanan > img {
+     order: 1;
+}
+
+.cerita-kanan .cerita-text {
+     order: 2;
+}
+
+
+/*================================================*/
+/* RESPONSIVE */
+/*================================================*/
+
+@media (max-width: 700px) {
+
+     #story {
+          padding: 45px 0 70px;
+     }
+
+     #story > h2 {
+          width: 90%;
+          margin-bottom: 45px;
+     }
+
+
+     /* BLOK CERITA */
+
+     .cerita {
+          width: 90%;
+
+          flex-direction: column;
+
+          align-items: center;
+
+          gap: 20px;
+     }
+
+
+     /* TEKS */
+
+     .cerita-text {
+          width: 100%;
+          padding: 0 10px;
+
+          text-align: center;
+     }
+
+
+     /* GAMBAR */
+
+     .cerita > img {
+          width: 100%;
+          height: auto;
+     }
+
+
+     /* URUTAN MOBILE */
+
+     .cerita-kiri .cerita-text,
+     .cerita-kanan .cerita-text {
+          order: 1;
+     }
+
+     .cerita-kiri > img,
+     .cerita-kanan > img {
+          order: 2;
+     }
+
+
+     /* JARAK */
+
+     .cerita + .cerita {
+          margin-top: 45px;
+     }
+
+}
+
+/*================================================*/
+/* UCAPAN */
+/*================================================*/
+
+#ucapan {
+     position: relative;
+
+     width: 100%;
+     min-height: 650px;
+
+     padding: 80px 8% 100px;
+
+     background-color: #fffbee;
+
+     text-align: center;
+
+     overflow: hidden;
+}
+
+
+/*================================================*/
+/* JUDUL */
+/*================================================*/
+
+#ucapan h1 {
+     margin: 0;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: clamp(42px, 4vw, 52px);
+     font-weight: 700;
+
+     color: #111;
+}
+
+
+/*================================================*/
+/* ORNAMEN TENGAH */
+/*================================================*/
+
+#ucapan .ornamen-tengah {
+     display: block;
+
+     width: 200px;
+     max-width: 35%;
+
+     margin: 5px auto 30px;
+}
+
+
+/*================================================*/
+/* ORNAMEN KIRI ATAS */
+/*================================================*/
+
+#ucapan .ornamen-kiri-atas {
+     position: absolute;
+
+     top: 0;
+     left: 15px;
+
+     width: 140px;
+     height: auto;
+}
+
+
+/*================================================*/
+/* ORNAMEN KANAN BAWAH */
+/*================================================*/
+
+#ucapan .ornamen-kanan-bawah {
+     position: absolute;
+
+     right: 15px;
+     bottom: 0;
+
+     width: 140px;
+     height: auto;
+
+     transform: rotate(180deg);
+}
+
+
+/*================================================*/
+/* ISI UCAPAN */
+/*================================================*/
+
+#ucapan p {
+     width: 85%;
+     max-width: 950px;
+
+     margin: 0 auto;
+
+     font-family: "Cormorant Garamond", serif;
+     font-size: clamp(22px, 2vw, 30px);
+     font-weight: 600;
+
+     line-height: 1.35;
+
+     text-align: center;
+
+     color: #111;
+}
+
+
+/*================================================*/
+/* RESPONSIVE */
+/*================================================*/
+
+@media (max-width: 700px) {
+
+     #ucapan {
+          min-height: 600px;
+
+          padding: 90px 8% 100px;
+     }
+
+     #ucapan .ornamen-kiri-atas,
+     #ucapan .ornamen-kanan-bawah {
+          width: 100px;
+     }
+
+     #ucapan .ornamen-kiri-atas {
+          left: 10px;
+     }
+
+     #ucapan .ornamen-kanan-bawah {
+          right: 10px;
+     }
+
+     #ucapan p {
+          width: 90%;
+
+          font-size: 20px;
+          line-height: 1.4;
      }
 
 }
