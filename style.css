@@ -1,990 +1,664 @@
+:root {
+    --kapur: #f2f3f0;
+    --kapur-2: #e1e6ea;
+
+    --hijau: #1b2a41;
+    --hijau-2: #26385a;
+
+    --kuning: #b08d57;
+    --marun: #4a6078;
+
+    --teks: #24303f;
+
+    --f0: clamp(1.125rem, 1.04rem + 0.4vw, 1.3rem);
+    --f1: calc(var(--f0) * 1.272);
+    --f2: calc(var(--f0) * 1.618);
+    --f3: calc(var(--f0) * 2.618);
+    --f4: calc(var(--f0) * 4.236);
+
+    --s1: 8px;
+    --s2: 13px;
+    --s3: 21px;
+    --s4: 34px;
+    --s5: 55px;
+    --s6: 89px;
+    --s7: 144px;
+
+    --pad: clamp(var(--s3), 8vw, var(--s7));
+}
+
 * {
-     margin: 0;
-     padding: 0;
-     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-     background-color: #fffbee;
-     font-family: "Cormorant Garamond", serif;
+    background: var(--kapur);
+    color: var(--teks);
+    font-family: "Cormorant Garamond", serif;
+    font-size: var(--f0);
+    font-weight: 500;
+    line-height: 1.618;
+}
+
+img {
+    max-width: 100%;
 }
 
 #bungkus {
-     width: 100%;
-     max-width: 1920px;
-     margin: auto;
+    max-width: 1920px;
+    margin: auto;
 }
 
-/* ==================== COVER ==================== */
-
-#cover {
-     width: 100%;
-}
+/* Cover */
 
 #cover-image {
-     position: relative;
-     width: 100%;
-     height: clamp(650px, 85vh, 900px);
-     background-image: url("media/belakang-belakangan-putih.jpeg");
-     background-size: cover;
-     background-position: center center;
-     overflow: hidden;
+    position: relative;
+    height: clamp(650px, 88vh, 940px);
+    overflow: hidden;
+    background: url("media/belakang-belakangan-putih.jpeg") center / cover;
 }
 
-/* ==================== THE WEDDING OF ==================== */
+#cover-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+        180deg,
+        rgba(27, 42, 65, 0.55) 0%,
+        rgba(27, 42, 65, 0) 38.2%,
+        rgba(27, 42, 65, 0) 61.8%,
+        rgba(27, 42, 65, 0.6) 100%
+    );
+}
 
 #wedding-title {
-     position: absolute;
-     top: 25px;
-     left: 35px;
+    position: absolute;
+    top: var(--s4);
+    left: var(--pad);
+    z-index: 2;
 
-     color: white;
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(24px, 2.2vw, 36px);
-     font-weight: 500;
+    color: var(--kapur);
+    font-size: var(--f1);
+    font-weight: 500;
+    letter-spacing: 0.04em;
 }
 
-/* ==================== MALIK & HARSYA ==================== */
-
 #couple-name {
-     position: absolute;
-     top: 37%;
-     left: 0;
+    position: absolute;
+    top: 38.2%;
+    left: 0;
+    z-index: 2;
 
-     width: 100%;
-     padding: 0 5%;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
 
-     display: flex;
-     align-items: baseline;
-     justify-content: space-between;
+    width: 100%;
+    padding: 0 var(--pad);
 
-     color: #e8ffff;
-     font-family: "Great Vibes", cursive;
-     font-size: clamp(55px, 6.5vw, 110px);
-
-     z-index: 2;
+    color: var(--kapur);
+    font-family: "Great Vibes", cursive;
+    font-size: clamp(55px, 8vw, 136px);
+    line-height: 1;
+    text-shadow: 0 2px 24px rgba(27, 42, 65, 0.45);
 }
 
 #couple-name span:nth-child(2) {
-     font-size: clamp(35px, 3.5vw, 60px);
+    color: var(--kuning);
+    font-size: 0.5em;
 }
-
-/* ==================== BLOK UNDANGAN ==================== */
 
 #cover-text {
-     position: absolute;
-     left: 0;
-     bottom: 13%;
+    position: absolute;
+    left: 0;
+    bottom: 13%;
+    z-index: 3;
 
-     width: 100%;
-     min-height: 115px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     justify-content: center;
+    width: 100%;
+    min-height: 115px;
 
-     background-color: #fffbee;
-
-     z-index: 3;
+    background: var(--kapur);
 }
-
-/* ==================== TEKS UNDANGAN ==================== */
 
 #cover-invitation {
-     margin: 0 0 5px 0;
-
-     color: #3d3429;
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(18px, 1.5vw, 25px);
-     font-weight: 600;
-     text-align: center;
+    margin-bottom: var(--s1);
+    color: var(--hijau);
+    font-size: var(--f0);
+    font-weight: 600;
 }
-
-/* ==================== NAMA TAMU ==================== */
 
 #cover-name {
-     margin: 0;
-
-     color: #b89555;
-     font-family: "Great Vibes", cursive;
-     font-size: clamp(50px, 5.5vw, 85px);
-     text-align: center;
+    color: var(--marun);
+    font-family: "Great Vibes", cursive;
+    font-size: clamp(46px, 5.5vw, 85px);
+    line-height: 1.1;
+    text-align: center;
 }
-
-/* ==================== TANGGAL ==================== */
 
 #cover-date {
-     position: absolute;
-     left: 0;
-     bottom: 3%;
+    position: absolute;
+    left: 0;
+    bottom: 3%;
+    z-index: 4;
 
-     width: 100%;
+    width: 100%;
 
-     color: white;
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(20px, 2vw, 28px);
-     font-weight: 600;
-     text-align: center;
-
-     z-index: 4;
+    color: var(--kapur);
+    font-size: var(--f1);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-align: center;
 }
 
-/* ==================== SECTION LAIN ==================== */
+/* Buttons */
 
-#tujuan-undangan,
+button,
+.btn {
+    display: inline-block;
+
+    margin-top: var(--s4);
+    padding: var(--s2) var(--s4);
+
+    border: 1px solid var(--hijau);
+    border-radius: 2px;
+
+    background: var(--hijau);
+    color: var(--kapur);
+
+    font: 600 var(--f0) / 1 "Cormorant Garamond", serif;
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+button:hover,
+.btn:hover {
+    background: var(--marun);
+    border-color: var(--marun);
+}
+
+button:focus-visible,
+.btn:focus-visible {
+    outline: 2px solid var(--kuning);
+    outline-offset: 3px;
+}
+
+/* General */
+
 #informasi-pengundang,
 #waktu-acara,
 #lokasi-acara,
 #galeri,
 #story,
 #ucapan {
-     width: 100%;
+    text-align: center;
 }
 
-/*===============================================*/
-
-#tujuan-undangan {
-     width: 100%;
-     margin-top: 30px;
-     background-color: #fffbee;
+h1 {
+    color: var(--hijau);
+    font-size: var(--f3);
+    font-weight: 500;
+    line-height: 1.1;
 }
+
+/* Invitation */
 
 #ucapan-tujuan {
-     position: relative;
-     width: 100%;
-     min-height: 650px;
-     padding: 190px 8% 120px;
+    position: relative;
 
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     justify-content: flex-start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-     overflow: hidden;
+    padding: var(--s7) var(--pad) var(--s6);
+    overflow: hidden;
+
+    text-align: center;
 }
 
-/* ORNAMEN KIRI ATAS */
 #ucapan-tujuan img:nth-child(1) {
-     position: absolute;
-     top: 0;
-     left: 50px;
+    position: absolute;
+    top: 0;
+    left: var(--s4);
 }
 
-/* ORNAMEN LURUS ATAS */
 #ucapan-tujuan img:nth-child(2) {
-     width: 480px;
-     max-width: 45%;
-     margin-bottom: 20px;
+    width: 480px;
+    max-width: 45%;
+    margin-bottom: var(--s3);
 }
 
-/* TEKS */
 #ucapan-tujuan p {
-     max-width: 1000px;
-     margin: 0;
+    max-width: 38em;
 
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(22px, 2.2vw, 32px);
-     font-weight: 600;
-     line-height: 1.3;
-     text-align: center;
-     color: #111;
+    color: var(--hijau);
+    font-size: var(--f2);
+    font-weight: 500;
+    line-height: 1.4;
 }
 
-/* BUTTON RSVP */
-#ucapan-tujuan button {
-     width: 235px;
-     height: 56px;
-     margin-top: 30px;
-
-     border: none;
-     border-radius: 30px;
-
-     background-color: #b89555;
-     color: white;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: 20px;
-     font-weight: 600;
-
-     cursor: pointer;
-}
-
-/* ORNAMEN LURUS BAWAH */
 #ucapan-tujuan img:nth-child(5) {
-     width: 250px;
-     max-width: 30%;
-     margin-top: 30px;
+    width: 250px;
+    max-width: 30%;
+    margin-top: var(--s4);
 }
 
-/* ORNAMEN KANAN BAWAH */
 #ucapan-tujuan img:nth-child(6) {
-     position: absolute;
-     right: 50px;
-     bottom: 0;
+    position: absolute;
+    right: var(--s4);
+    bottom: 0;
 
-     transform: rotate(180deg);
+    transform: rotate(180deg);
 }
-/*================================================*/
-/* INFORMASI PENGUNDANG */
-/*================================================*/
+
+/* Couple */
 
 #informasi-pengundang {
-     width: 100%;
-     min-height: 900px;
-     padding: 10px 5% 80px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 400px));
+    justify-content: center;
+    column-gap: var(--s5);
 
-     background-color: #fffbee;
-     text-align: center;
+    padding: var(--s6) var(--pad) var(--s7);
 }
 
-/* JUDUL */
-
-#informasi-pengundang h1 {
-     margin: 0;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(40px, 4vw, 58px);
-     font-weight: 700;
+#informasi-pengundang > h1,
+#informasi-pengundang > h2,
+#ornamen-tengah {
+    grid-column: 1 / -1;
 }
 
-#informasi-pengundang h2 {
-     margin: 5px 0 8px;
+#informasi-pengundang > h2 {
+    margin: var(--s1) 0 var(--s3);
 
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(22px, 2.2vw, 32px);
-     font-weight: 600;
+    color: var(--marun);
+    font-size: var(--f1);
+    font-weight: 500;
 }
-
-/* ORNAMEN TENGAH */
 
 #ornamen-tengah {
-     display: block;
-     width: 200px;
-     max-width: 30%;
-     margin: 0 auto 35px;
+    width: 200px;
+    max-width: 30%;
+    margin: 0 auto var(--s5);
 }
-
-/* AREA MEMPELAI */
-
-#mempelai-pria,
-#mempelai-wanita {
-     width: 40%;
-}
-
-/* POSISI KIRI DAN KANAN */
-
-#mempelai-pria {
-     float: left;
-}
-
-#mempelai-wanita {
-     float: right;
-}
-
-/* FOTO */
 
 .foto-mempelai {
-     display: block;
+    display: block;
 
-     width: 400px;
-     height: 600px;
-     max-width: 100%;
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 1 / 1.618;
 
-     margin: 0 auto;
+    padding: var(--s2);
 
-     object-fit: cover;
-     border-radius: 12px;
+    border: 1px solid var(--marun);
+
+    object-fit: cover;
 }
 
-/* TEKS */
+#mempelai-wanita {
+    margin-top: var(--s5);
+}
+
+#mempelai-wanita .foto-mempelai {
+    border-color: var(--kuning);
+}
 
 #mempelai-pria p,
 #mempelai-wanita p {
-     margin: 25px auto 0;
+    margin-top: var(--s4);
 
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(20px, 2vw, 28px);
-     font-weight: 600;
-     line-height: 1.35;
-     text-align: center;
-     color: #3d3429;
+    color: var(--hijau);
+    font-size: var(--f1);
+    line-height: 1.4;
 }
 
-/* MEMBERSIHKAN FLOAT */
-
-#informasi-pengundang::after {
-     content: "";
-     display: block;
-     clear: both;
-}
-/*================================================*/
-/* WAKTU ACARA */
-/*================================================*/
+/* Event */
 
 #waktu-acara {
-     width: 100%;
-     padding: 25px 0 0;
+    padding: 0 var(--pad) var(--s7);
 
-     background-color: #fffbee;
-
-     text-align: center;
+    background: var(--hijau);
+    color: var(--kapur);
 }
 
-#waktu-acara > h1 {
-     margin: 0;
+#waktu-acara::before,
+#ucapan::before {
+    content: "";
 
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(38px, 4vw, 55px);
-     font-weight: 700;
+    display: block;
+
+    height: 5px;
+    margin: 0 calc(var(--pad) * -1) var(--s5);
+
+    border-top: 1px solid var(--kuning);
+    border-bottom: 1px solid var(--kuning);
 }
 
-#waktu-acara > .tanggal-acara {
-     margin: 0 0 10px;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(20px, 2vw, 28px);
-     font-weight: 600;
+#waktu-acara h1 {
+    color: var(--kapur);
 }
 
-/*================================================*/
-/* PEMBUNGKUS WAKTU */
-/*================================================*/
+.tanggal-acara {
+    margin: var(--s2) 0 var(--s5);
 
-.waktu {
-     width: 100%;
-     margin-top: 30px;
+    color: var(--kuning);
+    font-size: var(--f1);
+    font-weight: 500;
 }
 
-/*================================================*/
-/* ISI WAKTU */
-/*================================================*/
+.waktu + .waktu {
+    margin-top: var(--s6);
+}
 
 .waktu-isi {
-     width: 90%;
-     margin-left: 5%;
-
-     display: flex;
-     align-items: center;
+    display: flex;
+    align-items: center;
+    gap: var(--s5);
 }
 
-/*================================================*/
-/* INFORMASI */
-/*================================================*/
+.waktu + .waktu .waktu-isi {
+    flex-direction: row-reverse;
+}
 
 .waktu-info {
-     width: 45%;
-     padding: 30px 40px;
-
-     text-align: center;
+    flex: 0 0 38.2%;
 }
 
-.waktu-info .jam {
-     margin: 0 0 30px;
+.waktu-isi img {
+    flex: 1 1 61.8%;
 
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(22px, 2.2vw, 32px);
-     font-weight: 600;
+    min-width: 0;
+    aspect-ratio: 1.618 / 1;
+
+    padding: var(--s2);
+
+    border: 1px solid var(--kuning);
+
+    object-fit: cover;
+}
+
+.jam {
+    margin-bottom: var(--s2);
+
+    color: var(--kuning);
+    font-size: var(--f1);
+    font-weight: 600;
 }
 
 .waktu-info h2 {
-     margin: 0 0 20px;
+    margin-bottom: var(--s3);
 
-     font-family: "Great Vibes", cursive;
-     font-size: clamp(50px, 5.5vw, 80px);
-     font-weight: 400;
+    font-family: "Great Vibes", cursive;
+    font-size: var(--f4);
+    font-weight: 400;
+    line-height: 1.1;
 }
 
 .waktu-info p:last-child {
-     max-width: 400px;
-     margin: auto;
+    max-width: 24em;
+    margin: auto;
 
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(22px, 2vw, 30px);
-     font-weight: 600;
-     line-height: 1.4;
+    font-size: var(--f0);
 }
 
-/*================================================*/
-/* GAMBAR */
-/*================================================*/
-
-.waktu-isi img {
-     width: 40%;
-     height: 400px;
-
-     margin-left: auto;
-
-     object-fit: cover;
-}
-
-/*================================================*/
-/* JARAK ANTAR WAKTU */
-/*================================================*/
-
-.waktu + .waktu {
-     margin-top: 60px;
-}
-
-/*================================================*/
-/* RESPONSIVE */
-/*================================================*/
-
-@media (max-width: 700px) {
-
-     .waktu-isi {
-          width: 100%;
-          margin: 0;
-
-          flex-direction: column;
-     }
-
-     .waktu-info {
-          width: 100%;
-          padding: 30px 25px;
-     }
-
-     .waktu-isi img {
-          width: 75%;
-          height: 220px;
-
-          margin: 0 auto;
-     }
-
-}
-
-/*================================================*/
-/* LOKASI ACARA */
-/*================================================*/
+/* Location */
 
 #lokasi-acara {
-     width: 100%;
-     padding: 25px 3% 40px;
-
-     background-color: #fffbee;
+    padding: var(--s7) var(--pad) var(--s6);
 }
-
-/* JUDUL */
-
-#lokasi-acara > h1 {
-     margin: 0 0 35px;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(42px, 4vw, 50px);
-     font-weight: 700;
-
-     text-align: center;
-}
-
-/*================================================*/
-/* ALAMAT */
-/*================================================*/
 
 #alamat {
-     width: 95%;
-     margin: auto;
+    display: grid;
+    grid-template-columns: 1.618fr 1fr;
+    align-items: start;
+    gap: var(--s5);
 
-     display: flex;
-     align-items: center;
-}
-
-/* TEKS */
-
-#alamat > div:first-child {
-     width: 40%;
-     padding: 0 25px;
+    margin-top: var(--s4);
 }
 
 #alamat h2 {
-     margin: 0 0 5px;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(30px, 3vw, 38px);
-     font-weight: 700;
+    color: var(--marun);
+    font-size: calc(var(--f0) * 2.058);
+    font-weight: 600;
+    line-height: 1.2;
 }
 
 #alamat p {
-     margin: 0 0 30px;
+    max-width: 34em;
+    margin: var(--s2) auto 0;
 
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(20px, 1.8vw, 23px);
-     font-weight: 600;
-     line-height: 1.4;
+    font-size: var(--f1);
+    line-height: 1.5;
 }
 
-/* GAMBAR */
-
-#alamat > div:last-child {
-     width: 60%;
+#alamat p:first-of-type {
+    color: var(--hijau);
+    font-weight: 600;
 }
 
 #alamat img {
-     display: block;
+    display: block;
 
-     width: 100%;
-     height: auto;
+    width: 100%;
+    padding: var(--s2);
 
-     object-fit: cover;
+    border: 1px solid var(--hijau);
 }
 
-/*================================================*/
-/* BUTTON */
-/*================================================*/
-
-#alamat button {
-     width: 135px;
-     height: 50px;
-
-     border: none;
-     border-radius: 30px;
-
-     background-color: #b89555;
-     color: white;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: 19px;
-     font-weight: 600;
-}
-
-/*================================================*/
-/* GALERI */
-/*================================================*/
+/* Gallery */
 
 #galeri {
-     width: 100%;
-     padding: 60px 4% 80px;
-
-     background-color: #fffbee;
-
-     text-align: center;
+    padding: var(--s6) var(--pad);
 }
 
-/* JUDUL */
-
-#galeri > h1 {
-     margin: 0 0 40px;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(42px, 4vw, 52px);
-     font-weight: 700;
-
-     color: #111;
+#galeri h1 {
+    margin-bottom: var(--s4);
 }
 
-/*================================================*/
-/* KUMPULAN FOTO */
-/*================================================*/
+#galeri-list {
+    display: grid;
+    grid-template-columns: 1.618fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--s2);
 
-#galeri > div {
-     width: 100%;
-     max-width: 1200px;
-     margin: auto;
-
-     display: grid;
-     grid-template-columns: 1fr 1fr;
-     grid-template-rows: 280px 280px;
-
-     gap: 15px;
+    aspect-ratio: 1.618 / 1;
 }
 
-/* FOTO */
+#galeri-list img {
+    width: 100%;
+    height: 100%;
 
-#galeri img {
-     width: 100%;
-     height: 100%;
-
-     display: block;
-
-     object-fit: cover;
-
-     border-radius: 8px;
+    object-fit: cover;
 }
 
-/* FOTO PERTAMA */
-
-#galeri img:nth-child(1) {
-     grid-row: 1 / 3;
+#galeri-list img:nth-child(1) {
+    grid-row: 1 / 3;
 }
 
-/*================================================*/
-/* RESPONSIVE */
-/*================================================*/
-
-@media (max-width: 700px) {
-
-     #galeri {
-          padding: 45px 5% 60px;
-     }
-
-     #galeri > div {
-          grid-template-columns: 1fr;
-          grid-template-rows: repeat(3, 250px);
-
-          gap: 15px;
-     }
-
-     #galeri img:nth-child(1) {
-          grid-row: auto;
-     }
-
-}
-
-/*================================================*/
-/* STORY */
-/*================================================*/
+/* Story */
 
 #story {
-     width: 100%;
-     padding: 60px 0 100px;
-     background-color: #fffbee;
-     text-align: center;
+    padding: var(--s6) var(--pad) var(--s7);
+
+    background: var(--kapur-2);
 }
 
+.ornamen-story {
+    display: block;
 
-/*================================================*/
-/* JUDUL STORY */
-/*================================================*/
-
-#story > h1 {
-     margin: 0;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(42px, 4vw, 52px);
-     font-weight: 700;
-
-     color: #111;
+    width: 200px;
+    max-width: 35%;
+    margin: var(--s2) auto var(--s3);
 }
-
-
-/*================================================*/
-/* ORNAMEN */
-/*================================================*/
-
-#story > .ornamen-story {
-     display: block;
-
-     width: 200px;
-     max-width: 35%;
-
-     margin: 10px auto 25px;
-}
-
-
-/*================================================*/
-/* DESKRIPSI */
-/*================================================*/
 
 #story > h2 {
-     width: 80%;
-     max-width: 900px;
+    max-width: 34em;
+    margin: 0 auto var(--s6);
 
-     margin: 0 auto 60px;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(20px, 1.8vw, 26px);
-     font-weight: 600;
-     line-height: 1.4;
-
-     color: #3d3429;
+    color: var(--marun);
+    font-size: var(--f1);
+    font-weight: 500;
+    line-height: 1.5;
 }
-
-
-/*================================================*/
-/* BLOK CERITA */
-/*================================================*/
 
 .cerita {
-     width: 90%;
-     margin: 0 auto;
-
-     display: flex;
-     align-items: center;
+    display: flex;
+    align-items: center;
+    gap: var(--s5);
 }
 
-
-/*================================================*/
-/* TEKS */
-/*================================================*/
+.cerita + .cerita {
+    margin-top: var(--s5);
+}
 
 .cerita-text {
-     width: 50%;
-     padding: 0 45px;
+    flex: 0 0 38.2%;
+}
 
-     text-align: left;
+.cerita > img {
+    flex: 1 1 61.8%;
+
+    min-width: 0;
+    aspect-ratio: 1.618 / 1;
+
+    padding: var(--s2);
+
+    border: 1px solid var(--marun);
+
+    object-fit: cover;
+}
+
+.cerita-kanan {
+    flex-direction: row;
 }
 
 .cerita-text h3 {
-     margin: 0 0 8px;
+    margin-bottom: var(--s2);
 
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(25px, 2.3vw, 32px);
-     font-weight: 700;
-
-     color: #111;
+    color: var(--hijau);
+    font-size: var(--f2);
+    font-weight: 600;
+    line-height: 1.2;
 }
 
-.cerita-text p {
-     margin: 0;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(18px, 1.5vw, 22px);
-     font-weight: 600;
-     line-height: 1.4;
-
-     color: #3d3429;
-}
-
-
-/*================================================*/
-/* GAMBAR */
-/*================================================*/
-
-.cerita > img {
-     width: 50%;
-     height: auto;
-
-     display: block;
-
-     border-radius: 8px;
-}
-
-
-/*================================================*/
-/* JARAK ANTAR CERITA */
-/*================================================*/
-
-.cerita + .cerita {
-     margin-top: 30px;
-}
-
-
-/*================================================*/
-/* CERITA KIRI */
-/*================================================*/
-
-.cerita-kiri .cerita-text {
-     order: 1;
-}
-
-.cerita-kiri > img {
-     order: 2;
-}
-
-
-/*================================================*/
-/* CERITA KANAN */
-/*================================================*/
-
-.cerita-kanan > img {
-     order: 1;
-}
-
-.cerita-kanan .cerita-text {
-     order: 2;
-}
-
-
-/*================================================*/
-/* RESPONSIVE */
-/*================================================*/
-
-@media (max-width: 700px) {
-
-     #story {
-          padding: 45px 0 70px;
-     }
-
-     #story > h2 {
-          width: 90%;
-          margin-bottom: 45px;
-     }
-
-
-     /* BLOK CERITA */
-
-     .cerita {
-          width: 90%;
-
-          flex-direction: column;
-
-          align-items: center;
-
-          gap: 20px;
-     }
-
-
-     /* TEKS */
-
-     .cerita-text {
-          width: 100%;
-          padding: 0 10px;
-
-          text-align: center;
-     }
-
-
-     /* GAMBAR */
-
-     .cerita > img {
-          width: 100%;
-          height: auto;
-     }
-
-
-     /* URUTAN MOBILE */
-
-     .cerita-kiri .cerita-text,
-     .cerita-kanan .cerita-text {
-          order: 1;
-     }
-
-     .cerita-kiri > img,
-     .cerita-kanan > img {
-          order: 2;
-     }
-
-
-     /* JARAK */
-
-     .cerita + .cerita {
-          margin-top: 45px;
-     }
-
-}
-
-/*================================================*/
-/* UCAPAN */
-/*================================================*/
+/* Wishes */
 
 #ucapan {
-     position: relative;
+    position: relative;
 
-     width: 100%;
-     min-height: 650px;
+    padding: 0 var(--pad) var(--s7);
+    overflow: hidden;
 
-     padding: 80px 8% 100px;
-
-     background-color: #fffbee;
-
-     text-align: center;
-
-     overflow: hidden;
+    background: var(--hijau-2);
+    color: var(--kapur);
 }
-
-
-/*================================================*/
-/* JUDUL */
-/*================================================*/
 
 #ucapan h1 {
-     margin: 0;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(42px, 4vw, 52px);
-     font-weight: 700;
-
-     color: #111;
+    color: var(--kuning);
 }
-
-
-/*================================================*/
-/* ORNAMEN TENGAH */
-/*================================================*/
 
 #ucapan .ornamen-tengah {
-     display: block;
+    display: block;
 
-     width: 200px;
-     max-width: 35%;
-
-     margin: 5px auto 30px;
+    width: 200px;
+    max-width: 35%;
+    margin: var(--s2) auto var(--s4);
 }
 
+#ucapan > p {
+    max-width: 34em;
+    margin: auto;
 
-/*================================================*/
-/* ORNAMEN KIRI ATAS */
-/*================================================*/
+    font-size: var(--f1);
+    line-height: 1.5;
+}
+
+#ucapan .ornamen-kiri-atas,
+#ucapan .ornamen-kanan-bawah {
+    position: absolute;
+    width: 140px;
+}
 
 #ucapan .ornamen-kiri-atas {
-     position: absolute;
-
-     top: 0;
-     left: 15px;
-
-     width: 140px;
-     height: auto;
+    top: 13px;
+    left: var(--s4);
 }
-
-
-/*================================================*/
-/* ORNAMEN KANAN BAWAH */
-/*================================================*/
 
 #ucapan .ornamen-kanan-bawah {
-     position: absolute;
+    right: var(--s4);
+    bottom: 0;
 
-     right: 15px;
-     bottom: 0;
-
-     width: 140px;
-     height: auto;
-
-     transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
-
-/*================================================*/
-/* ISI UCAPAN */
-/*================================================*/
-
-#ucapan p {
-     width: 85%;
-     max-width: 950px;
-
-     margin: 0 auto;
-
-     font-family: "Cormorant Garamond", serif;
-     font-size: clamp(22px, 2vw, 30px);
-     font-weight: 600;
-
-     line-height: 1.35;
-
-     text-align: center;
-
-     color: #111;
-}
-
-
-/*================================================*/
-/* RESPONSIVE */
-/*================================================*/
+/* Mobile */
 
 @media (max-width: 700px) {
+    #couple-name {
+        top: 30%;
 
-     #ucapan {
-          min-height: 600px;
+        flex-direction: column;
+        align-items: center;
+    }
 
-          padding: 90px 8% 100px;
-     }
+    #informasi-pengundang {
+        grid-template-columns: 1fr;
+    }
 
-     #ucapan .ornamen-kiri-atas,
-     #ucapan .ornamen-kanan-bawah {
-          width: 100px;
-     }
+    #mempelai-pria,
+    #mempelai-wanita {
+        margin-top: var(--s5);
+    }
 
-     #ucapan .ornamen-kiri-atas {
-          left: 10px;
-     }
+    .waktu-isi,
+    .waktu + .waktu .waktu-isi,
+    .cerita,
+    #alamat {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s3);
+    }
 
-     #ucapan .ornamen-kanan-bawah {
-          right: 10px;
-     }
+    .waktu-info,
+    .cerita-text {
+        width: 100%;
+        flex: none;
+    }
 
-     #ucapan p {
-          width: 90%;
+    .waktu-isi img,
+    .cerita > img {
+        width: 100%;
+        flex: none;
+    }
 
-          font-size: 20px;
-          line-height: 1.4;
-     }
+    #galeri-list {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        grid-auto-rows: 240px;
 
+        aspect-ratio: auto;
+    }
+
+    #galeri-list img:nth-child(1) {
+        grid-row: auto;
+    }
+
+    #ucapan-tujuan p {
+        font-size: var(--f1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
 }
