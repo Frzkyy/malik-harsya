@@ -35,11 +35,25 @@ try {
     $total_hal = 1;
 }
 
+$galeri = [];
+try {
+    $galeri = db()->query('SELECT file, lebar, tinggi FROM galeri ORDER BY id')->fetchAll();
+} catch (Throwable $ex) {
+    error_log('Gagal memuat galeri: ' . $ex->getMessage());
+}
+
 try {
     $pengantin = ambil_pengantin();
 } catch (Throwable $ex) {
     error_log('Gagal memuat pengantin: ' . $ex->getMessage());
     $pengantin = [];
+}
+
+// Rasio lebar/tinggi foto; foto yang sangat ekstrem dijepit supaya layout tetap rapi.
+function rasio(int $w, int $h, float $min = 0.5, float $maks = 1.6): float
+{
+    if ($w < 1 || $h < 1) return 1 / 1.618;
+    return round(max($min, min($maks, $w / $h)), 4);
 }
 
 function orang_tua(array $p): string
@@ -130,7 +144,9 @@ function tgl_ucapan(string $utc, array $bulan): string
                 <?php if (empty($pengantin[$jenis])) continue; $p = $pengantin[$jenis]; ?>
                 <div id="mempelai-<?= $jenis ?>">
 
-                    <img class="foto-mempelai" src="<?= e($p['foto']) ?>" alt="<?= e($p['nama']) ?>">
+                    <img class="foto-mempelai" src="<?= e($p['foto']) ?>" alt="<?= e($p['nama']) ?>"
+                         style="aspect-ratio: <?= rasio((int) $p['foto_lebar'], (int) $p['foto_tinggi']) ?>"
+                         decoding="async">
 
                     <p>
                         <?= e($p['nama']) ?><br>
@@ -240,11 +256,30 @@ function tgl_ucapan(string $utc, array $bulan): string
 
             <h1>Galeri</h1>
 
-            <div id="galeri-list">
-                <img src="media/galeri-2.jpeg" alt="Galeri foto 1">
-                <img src="media/galeri-1.jpeg" alt="Galeri foto 2">
-                <img src="media/galeri-3.jpeg" alt="Galeri foto 3">
-            </div>
+            <?php if ($galeri): ?>
+                <ul id="galeri-list">
+                    <?php foreach ($galeri as $i => $g):
+                        $w = (int) $g['lebar']; $h = (int) $g['tinggi'];
+                        $r = $w > 0 && $h > 0 ? round($w / $h, 4) : 1.5;
+                    ?>
+                        <li style="--r: <?= $r ?>">
+                            <button type="button" class="galeri-foto" data-i="<?= $i ?>" aria-label="Perbesar foto <?= $i + 1 ?>">
+                                <img src="<?= e($g['file']) ?>" alt="Galeri foto <?= $i + 1 ?>"
+                                     <?= $w > 0 ? 'width="' . $w . '" height="' . $h . '"' : '' ?>
+                                     loading="lazy" decoding="async">
+                            </button>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+
+                <dialog id="galeri-box" aria-label="Foto galeri">
+                    <button type="button" class="gb-tutup" aria-label="Tutup">&times;</button>
+                    <button type="button" class="gb-nav gb-prev" aria-label="Sebelumnya">&lsaquo;</button>
+                    <img id="gb-img" alt="">
+                    <button type="button" class="gb-nav gb-next" aria-label="Berikutnya">&rsaquo;</button>
+                    <p id="gb-hitung"></p>
+                </dialog>
+            <?php endif; ?>
 
         </section>
 
@@ -455,6 +490,54 @@ function tgl_ucapan(string $utc, array $bulan): string
         </section>
 
     </main>
+
+    <script>
+    (function () {
+        var box = document.getElementById('galeri-box');
+        if (!box || !box.showModal) return;
+
+        var foto = Array.prototype.slice.call(document.querySelectorAll('#galeri-list img'));
+        var img = document.getElementById('gb-img');
+        var hitung = document.getElementById('gb-hitung');
+        var now = 0;
+
+        function tampil(i) {
+            now = (i + foto.length) % foto.length;
+            img.src = foto[now].currentSrc || foto[now].src;
+            img.alt = foto[now].alt;
+            hitung.textContent = (now + 1) + ' / ' + foto.length;
+        }
+
+        document.querySelectorAll('.galeri-foto').forEach(function (b) {
+            b.addEventListener('click', function () {
+                tampil(+b.dataset.i);
+                box.showModal();
+            });
+        });
+
+        box.querySelector('.gb-tutup').addEventListener('click', function () { box.close(); });
+        box.querySelector('.gb-prev').addEventListener('click', function () { tampil(now - 1); });
+        box.querySelector('.gb-next').addEventListener('click', function () { tampil(now + 1); });
+
+        // Klik area gelap di luar foto = tutup.
+        box.addEventListener('click', function (e) { if (e.target === box) box.close(); });
+
+        box.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft') tampil(now - 1);
+            if (e.key === 'ArrowRight') tampil(now + 1);
+        });
+
+        // Geser kiri/kanan di layar sentuh.
+        var x0 = null;
+        box.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+        box.addEventListener('touchend', function (e) {
+            if (x0 === null) return;
+            var dx = e.changedTouches[0].clientX - x0;
+            if (Math.abs(dx) > 50) tampil(now + (dx < 0 ? 1 : -1));
+            x0 = null;
+        });
+    })();
+    </script>
 
 </body>
 </html>

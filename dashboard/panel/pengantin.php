@@ -6,7 +6,7 @@ $galeri    = [];
 
 try {
     $pengantin = ambil_pengantin();
-    $galeri = db()->query('SELECT id, file FROM galeri ORDER BY id')->fetchAll();
+    $galeri = db()->query('SELECT id, file, lebar, tinggi FROM galeri ORDER BY id')->fetchAll();
 } catch (Throwable $ex) {
     error_log('Panel pengantin gagal memuat data: ' . $ex->getMessage());
 }
@@ -25,7 +25,7 @@ $judul_jenis = ['pria' => 'Pengantin Pria', 'wanita' => 'Pengantin Wanita'];
         <section class="kartu profil" id="profil-<?= $jenis ?>" aria-labelledby="h-<?= $jenis ?>">
 
             <div class="foto">
-                <img src="../<?= e($p['foto']) ?>" alt="Foto <?= e($judul) ?>">
+                <img src="../<?= e($p['foto']) ?>" alt="Foto <?= e($judul) ?>"<?= $p['foto_lebar'] > 0 ? ' width="' . (int) $p['foto_lebar'] . '" height="' . (int) $p['foto_tinggi'] . '"' : '' ?>>
             </div>
 
             <?php if (!$mengedit): ?>
@@ -45,7 +45,7 @@ $judul_jenis = ['pria' => 'Pengantin Pria', 'wanita' => 'Pengantin Wanita'];
 
             <?php else: ?>
 
-                <form class="data" action="pengantin_aksi.php" method="post">
+                <form class="data" action="pengantin_aksi.php" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
                     <input type="hidden" name="aksi" value="simpan">
                     <input type="hidden" name="jenis" value="<?= $jenis ?>">
@@ -66,6 +66,9 @@ $judul_jenis = ['pria' => 'Pengantin Pria', 'wanita' => 'Pengantin Wanita'];
                     <label>Alamat
                         <textarea name="alamat" rows="3" maxlength="300"><?= e($p['alamat']) ?></textarea>
                     </label>
+                    <label>Ganti foto <small>(opsional · JPG/PNG/WebP, maks. 12 MB · rasio bebas)</small>
+                        <input type="file" name="foto" accept="image/jpeg,image/png,image/webp">
+                    </label>
                     <div class="aksi">
                         <button type="submit" class="tombol utama">Simpan</button>
                         <a class="tombol" href="index.php?panel=pengantin#profil-<?= $jenis ?>">Batal</a>
@@ -76,17 +79,32 @@ $judul_jenis = ['pria' => 'Pengantin Pria', 'wanita' => 'Pengantin Wanita'];
         </section>
     <?php endforeach; ?>
 
-    <section class="kartu galeri semua" aria-label="Galeri">
+    <section class="kartu galeri semua" id="galeri" aria-label="Galeri">
 
         <div class="kepala">
             <h3>Galeri <span class="hitung"><?= count($galeri) ?></span></h3>
+
+            <form class="unggah" action="galeri_aksi.php" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                <input type="hidden" name="aksi" value="tambah">
+                <input type="file" name="foto[]" accept="image/jpeg,image/png,image/webp" multiple required aria-label="Pilih foto galeri">
+                <button type="submit" class="tombol utama">Tambah foto</button>
+            </form>
         </div>
+
+        <p class="petunjuk">Bisa pilih banyak foto sekaligus. Portrait, landscape, atau persegi semuanya boleh &mdash; undangan menyesuaikan sendiri.</p>
 
         <?php if ($galeri): ?>
             <ul class="kolase">
                 <?php foreach ($galeri as $g): ?>
                     <li>
-                        <img src="../<?= e($g['file']) ?>" alt="" loading="lazy">
+                        <img src="../<?= e($g['file']) ?>" alt="" loading="lazy"<?= $g['lebar'] > 0 ? ' width="' . (int) $g['lebar'] . '" height="' . (int) $g['tinggi'] . '"' : '' ?>>
+                        <form action="galeri_aksi.php" method="post" onsubmit="return confirm('Hapus foto ini dari galeri?')">
+                            <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                            <input type="hidden" name="aksi" value="hapus">
+                            <input type="hidden" name="id" value="<?= (int) $g['id'] ?>">
+                            <button type="submit" aria-label="Hapus foto" title="Hapus foto">&times;</button>
+                        </form>
                     </li>
                 <?php endforeach; ?>
             </ul>

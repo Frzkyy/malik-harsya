@@ -117,9 +117,10 @@ body.dash {
 .profil .foto img {
     display: block;
     width: 100%;
-    aspect-ratio: 2 / 3;
+    height: auto;
+    max-height: 280px;
     border-radius: 2px;
-    object-fit: cover;
+    object-fit: contain;
     background: var(--sisi-biasa);
 }
 
@@ -218,6 +219,8 @@ input:focus-visible, textarea:focus-visible, .tombol:focus-visible, button:focus
 .kolase li:hover button, .kolase li button:focus-visible { opacity: 1; }
 @media (hover: none) { .kolase li button { opacity: 1; } }
 
+.petunjuk { margin: 0 0 12px; font-size: 13px; color: var(--redup); }
+
 .kosong-galeri { margin: 0; padding: 40px 0; text-align: center; color: var(--redup); }
 
 /* Panel lain */
@@ -232,6 +235,7 @@ input:focus-visible, textarea:focus-visible, .tombol:focus-visible, button:focus
 }
 
 @media (max-width: 760px) {
+    .kolase { columns: 2; }
     body.dash { grid-template-columns: 1fr; gap: 12px; }
     .sisi { position: static; min-height: 0; flex-direction: row; flex-wrap: wrap; align-items: center; }
     .sisi nav { flex-direction: row; flex-wrap: wrap; gap: 6px; }

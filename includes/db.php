@@ -51,18 +51,28 @@ function db(): PDO
             ibu    TEXT NOT NULL DEFAULT '',
             ayah   TEXT NOT NULL DEFAULT '',
             alamat TEXT NOT NULL DEFAULT '',
-            foto   TEXT NOT NULL DEFAULT ''
+            foto   TEXT NOT NULL DEFAULT '',
+            foto_lebar  INTEGER NOT NULL DEFAULT 0,
+            foto_tinggi INTEGER NOT NULL DEFAULT 0
         )
     ");
+    $kolom = array_column($pdo->query('PRAGMA table_info(pengantin)')->fetchAll(), 'name');
+    foreach (['foto_lebar', 'foto_tinggi'] as $k) {
+        if (!in_array($k, $kolom, true)) {
+            $pdo->exec("ALTER TABLE pengantin ADD COLUMN $k INTEGER NOT NULL DEFAULT 0");
+        }
+    }
+    $galeri_sudah_ada = (bool) $pdo->query("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'galeri'")->fetchColumn();
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS galeri (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
-            jenis      TEXT NOT NULL CHECK (jenis IN ('pria','wanita')),
-            file       TEXT NOT NULL,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            file       TEXT    NOT NULL,
+            lebar      INTEGER NOT NULL DEFAULT 0,
+            tinggi     INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
     ");
-    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_galeri_jenis ON galeri (jenis, id)');
+    migrasi_galeri($pdo);
 
     // Isi awal sama dengan teks yang sebelumnya tertulis langsung di index.php.
     $pdo->exec("
@@ -71,15 +81,16 @@ function db(): PDO
         ('wanita', 'Harsya Rahma, S.H',  'Dewi Lestari',   'Ahmad Fauzi',    '', 'media/perkenalan-mempelai-wanita.jpeg')
     ");
 
-    // Galeri hanya tampil (tidak bisa diubah dari dashboard); isi awal pakai foto yang sudah ada.
-    if ((int) $pdo->query('SELECT COUNT(*) FROM galeri')->fetchColumn() === 0) {
-        $pdo->exec("
-            INSERT INTO galeri (jenis, file) VALUES
-            ('pria',   'media/galeri-2.jpeg'),
-            ('pria',   'media/galeri-1.jpeg'),
-            ('wanita', 'media/galeri-3.jpeg')
-        ");
+    // Isi awal galeri = foto yang sebelumnya tertulis langsung di index.php.
+    // Hanya saat database baru; kalau admin menghapus semua foto, tidak diisi ulang.
+    if (!$galeri_sudah_ada && (int) $pdo->query('SELECT COUNT(*) FROM galeri')->fetchColumn() === 0) {
+        $isi = $pdo->prepare('INSERT INTO galeri (file) VALUES (?)');
+        foreach (['media/galeri-2.jpeg', 'media/galeri-1.jpeg', 'media/galeri-3.jpeg'] as $f) {
+            $isi->execute([$f]);
+        }
     }
+
+    isi_ukuran_gambar($pdo);
 
     // Seed superadmin pertama dari .env, hanya kalau tabel admin masih kosong.
     if ((int) $pdo->query('SELECT COUNT(*) FROM admin')->fetchColumn() === 0) {
@@ -92,6 +103,47 @@ function db(): PDO
     }
 
     return $pdo;
+}
+
+/** Database lama punya kolom `jenis` di galeri (pria/wanita) dan belum ada ukuran gambar. */
+function migrasi_galeri(PDO $pdo): void
+{
+    $kolom = array_column($pdo->query('PRAGMA table_info(galeri)')->fetchAll(), 'name');
+
+    if (in_array('jenis', $kolom, true)) {
+        $pdo->beginTransaction();
+        $pdo->exec('DROP INDEX IF EXISTS idx_galeri_jenis');
+        $pdo->exec('ALTER TABLE galeri RENAME TO galeri_lama');
+        $pdo->exec("
+            CREATE TABLE galeri (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                file       TEXT    NOT NULL,
+                lebar      INTEGER NOT NULL DEFAULT 0,
+                tinggi     INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+        ");
+        $pdo->exec('INSERT INTO galeri (id, file, created_at) SELECT id, file, created_at FROM galeri_lama ORDER BY id');
+        $pdo->exec('DROP TABLE galeri_lama');
+        $pdo->commit();
+    }
+}
+
+/** Lengkapi lebar/tinggi untuk baris lama (foto bawaan) supaya layout tahu rasionya. */
+function isi_ukuran_gambar(PDO $pdo): void
+{
+    require_once __DIR__ . '/upload.php';
+
+    foreach (['galeri' => ['id', 'file', 'lebar', 'tinggi'], 'pengantin' => ['jenis', 'foto', 'foto_lebar', 'foto_tinggi']] as $tabel => [$pk, $kf, $kl, $kt]) {
+        $baris = $pdo->query("SELECT $pk AS pk, $kf AS f FROM $tabel WHERE $kl = 0 OR $kt = 0")->fetchAll();
+        if (!$baris) continue;
+        $u = $pdo->prepare("UPDATE $tabel SET $kl = ?, $kt = ? WHERE $pk = ?");
+        foreach ($baris as $b) {
+            if ($b['f'] === '') continue;
+            [$w, $h] = ukuran_gambar($b['f']);
+            if ($w > 0) $u->execute([$w, $h, $b['pk']]);
+        }
+    }
 }
 
 /** @return array{pria: array, wanita: array} */

@@ -468,25 +468,152 @@ h1 {
     margin-bottom: var(--s4);
 }
 
+/*
+ * Galeri fleksibel: baris "justified". Lebar tiap foto mengikuti rasionya (--r = lebar/tinggi),
+ * jadi portrait, landscape, dan persegi bisa bercampur dan tiap baris tetap penuh tanpa potong gambar.
+ */
 #galeri-list {
-    display: grid;
-    grid-template-columns: 1.618fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    --baris: 240px;
+
+    display: flex;
+    flex-wrap: wrap;
     gap: var(--s2);
 
-    aspect-ratio: 1.618 / 1;
+    list-style: none;
 }
 
-#galeri-list img {
+#galeri-list li {
+    flex: calc(var(--r) * 100) 1 calc(var(--r) * var(--baris));
+    min-width: 0;
+}
+
+/* Penyangga: baris terakhir tidak ditarik melebar sampai fotonya raksasa. */
+#galeri-list::after {
+    content: "";
+    flex-grow: 1000000;
+}
+
+#galeri-list li:only-child {
+    flex: 1 1 100%;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.galeri-foto,
+.galeri-foto:hover {
+    display: block;
     width: 100%;
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+    background: var(--kapur-2);
+    cursor: zoom-in;
+}
+
+.galeri-foto img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.galeri-foto:focus-visible {
+    outline: 2px solid var(--kuning);
+    outline-offset: 2px;
+}
+
+/* Lightbox */
+
+#galeri-box {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    max-width: none;
     height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: var(--s3);
 
-    object-fit: cover;
+    border: 0;
+    background: rgba(12, 18, 28, .94);
+    color: #fff;
+
+    place-items: center;
 }
 
-#galeri-list img:nth-child(1) {
-    grid-row: 1 / 3;
+#galeri-box[open] {
+    display: grid;
 }
+
+#galeri-box::backdrop {
+    background: rgba(12, 18, 28, .94);
+}
+
+#gb-img {
+    display: block;
+    max-width: min(100%, 1200px);
+    max-height: calc(100dvh - 110px);
+
+    object-fit: contain;
+}
+
+#gb-hitung {
+    position: absolute;
+    bottom: var(--s2);
+    left: 0;
+    right: 0;
+
+    text-align: center;
+    font-size: .9rem;
+    opacity: .8;
+}
+
+.gb-tutup,
+.gb-nav {
+    position: absolute;
+
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .14);
+    color: #fff;
+
+    line-height: 1;
+    cursor: pointer;
+}
+
+.gb-tutup:hover,
+.gb-nav:hover {
+    border: 0;
+    background: rgba(255, 255, 255, .28);
+}
+
+.gb-tutup:focus-visible,
+.gb-nav:focus-visible {
+    outline: 2px solid var(--kuning);
+}
+
+.gb-tutup {
+    top: var(--s2);
+    right: var(--s2);
+    width: 44px;
+    height: 44px;
+    font-size: 28px;
+}
+
+.gb-nav {
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    margin-top: -22px;
+    font-size: 34px;
+    padding-bottom: 4px;
+}
+
+.gb-prev { left: var(--s1); }
+.gb-next { right: var(--s1); }
 
 /* Story */
 
@@ -897,15 +1024,9 @@ h1 {
     }
 
     #galeri-list {
-        grid-template-columns: 1fr;
-        grid-template-rows: none;
-        grid-auto-rows: 240px;
+        --baris: 150px;
 
-        aspect-ratio: auto;
-    }
-
-    #galeri-list img:nth-child(1) {
-        grid-row: auto;
+        gap: var(--s1);
     }
 
     #ucapan-tujuan p {

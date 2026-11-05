@@ -1,7 +1,8 @@
 <?php
-// Handler POST untuk panel Pengantin di dashboard admin (hanya teks).
+// Handler POST untuk panel Pengantin di dashboard admin (teks + ganti foto).
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/upload.php';
 
 require_admin();
 
@@ -16,6 +17,11 @@ function balik_pengantin(string $tipe, string $pesan, string $edit = ''): never
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php?panel=pengantin', true, 303);
     exit;
+}
+
+// Body melebihi post_max_size -> $_POST & $_FILES dikosongkan PHP.
+if (empty($_POST) && empty($_FILES) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+    balik_pengantin('error', 'Ukuran file terlalu besar (maksimal 12 MB).');
 }
 
 if (!csrf_valid($_POST['csrf'] ?? null)) {
@@ -44,10 +50,31 @@ if (!$panjang($alamat, 300)) {
     balik_pengantin('error', 'Alamat maksimal 300 karakter.', $jenis);
 }
 
+// Foto opsional: kosong = foto lama dipertahankan.
+$foto_baru = null;
+$ada_foto  = isset($_FILES['foto']) && ($_FILES['foto']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE;
+if ($ada_foto) {
+    try {
+        $foto_baru = simpan_gambar($_FILES['foto']);
+    } catch (RuntimeException $ex) {
+        balik_pengantin('error', 'Foto: ' . $ex->getMessage(), $jenis);
+    }
+}
+
 try {
-    db()->prepare('UPDATE pengantin SET nama = ?, ibu = ?, ayah = ?, alamat = ? WHERE jenis = ?')
-        ->execute([$nama, $ibu, $ayah, $alamat, $jenis]);
+    $pdo = db();
+    $lama = (string) $pdo->query('SELECT foto FROM pengantin WHERE jenis = ' . $pdo->quote($jenis))->fetchColumn();
+
+    if ($foto_baru) {
+        $pdo->prepare('UPDATE pengantin SET nama = ?, ibu = ?, ayah = ?, alamat = ?, foto = ?, foto_lebar = ?, foto_tinggi = ? WHERE jenis = ?')
+            ->execute([$nama, $ibu, $ayah, $alamat, $foto_baru['file'], $foto_baru['lebar'], $foto_baru['tinggi'], $jenis]);
+        hapus_unggahan($lama);
+    } else {
+        $pdo->prepare('UPDATE pengantin SET nama = ?, ibu = ?, ayah = ?, alamat = ? WHERE jenis = ?')
+            ->execute([$nama, $ibu, $ayah, $alamat, $jenis]);
+    }
 } catch (Throwable $ex) {
+    if ($foto_baru) hapus_unggahan($foto_baru['file']);
     error_log('Simpan pengantin gagal: ' . $ex->getMessage());
     balik_pengantin('error', 'Terjadi kesalahan. Coba lagi.', $jenis);
 }
