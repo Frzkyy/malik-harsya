@@ -243,3 +243,18 @@ input:focus-visible, textarea:focus-visible, .tombol:focus-visible, button:focus
     .profil { flex-direction: column; }
     .profil .foto { width: 100%; max-width: 220px; }
 }
+
+/* Pengaturan */
+.btn-bahaya {
+    border: 1px solid #b42318;
+    border-radius: 4px;
+    padding: 6px 14px;
+    background: #b42318;
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-bahaya:hover { background: #8f1c13; }
+.pengaturan-reset h2 { margin-top: 0; }
