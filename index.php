@@ -1,3 +1,10 @@
+<?php
+require_once __DIR__ . '/config.php';
+
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
+$old = $flash['old'] ?? [];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,7 +53,7 @@
                 Mohon konfirmasi kehadiran Anda melalui form RSVP di bawah.
             </p>
 
-            <button type="button">RSVP</button>
+            <a class="btn" href="#rsvp">RSVP</a>
 
             <img src="media/ornamen-lurus-bawah-1.png" alt="">
             <img src="media/ornamen-sudut-1.png" alt="">
@@ -293,6 +300,63 @@
             </p>
 
             <img class="ornamen-kanan-bawah" src="media/ornamen-sudut-1.png" alt="">
+
+        </section>
+
+        <section id="rsvp">
+
+            <h1>RSVP</h1>
+
+            <img class="ornamen-rsvp" src="media/ornamen-lurus-tengah-1.png" alt="">
+
+            <p>
+                Mohon konfirmasi kehadiran Anda agar kami dapat
+                mempersiapkan segalanya dengan sebaik mungkin.
+            </p>
+
+            <?php if ($flash): ?>
+                <p class="pesan-rsvp pesan-<?= e($flash['tipe']) ?>" role="status">
+                    <?= e($flash['pesan']) ?>
+                </p>
+            <?php endif; ?>
+
+            <form id="form-rsvp" action="submit.php" method="post">
+
+                <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+
+                <div class="jebakan" aria-hidden="true">
+                    <label for="rsvp-website">Website</label>
+                    <input type="text" id="rsvp-website" name="website" tabindex="-1" autocomplete="off">
+                </div>
+
+                <div class="field">
+                    <label for="rsvp-nama">Nama</label>
+                    <input type="text" id="rsvp-nama" name="nama" maxlength="100" autocomplete="name" value="<?= e($old['nama'] ?? '') ?>" required>
+                </div>
+
+                <fieldset class="field">
+                    <legend>Kehadiran</legend>
+
+                    <div class="pilihan">
+                        <label><input type="radio" name="status" value="hadir" required <?= ($old['status'] ?? '') === 'hadir' ? 'checked' : '' ?>> Hadir</label>
+                        <label><input type="radio" name="status" value="ragu" <?= ($old['status'] ?? '') === 'ragu' ? 'checked' : '' ?>> Belum pasti</label>
+                        <label><input type="radio" name="status" value="tidak" <?= ($old['status'] ?? '') === 'tidak' ? 'checked' : '' ?>> Tidak hadir</label>
+                    </div>
+                </fieldset>
+
+                <div class="field">
+                    <label for="rsvp-jumlah">Jumlah tamu</label>
+                    <input type="number" id="rsvp-jumlah" name="jumlah" min="1" max="5" value="<?= (int) ($old['jumlah'] ?? 1) ?: 1 ?>" required>
+                </div>
+
+                <div class="field">
+                    <label for="rsvp-pesan">Ucapan &amp; doa</label>
+                    <textarea id="rsvp-pesan" name="ucapan" rows="4" maxlength="500"><?= e($old['ucapan'] ?? '') ?></textarea>
+                </div>
+
+                <button type="submit">Kirim RSVP</button>
+
+            </form>
 
         </section>
 

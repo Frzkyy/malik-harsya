@@ -33,6 +33,10 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background: var(--kapur);
     color: var(--teks);
@@ -598,6 +602,144 @@ h1 {
     bottom: 0;
 
     transform: rotate(180deg);
+}
+
+/* RSVP */
+
+#rsvp {
+    padding: var(--s7) var(--pad);
+
+    text-align: center;
+}
+
+#rsvp .ornamen-rsvp {
+    display: block;
+
+    width: 200px;
+    max-width: 35%;
+    margin: var(--s2) auto var(--s3);
+}
+
+#rsvp > p {
+    max-width: 30em;
+    margin: 0 auto var(--s5);
+
+    color: var(--marun);
+    font-size: var(--f1);
+    line-height: 1.5;
+}
+
+#form-rsvp {
+    max-width: 34em;
+    margin: auto;
+
+    text-align: left;
+}
+
+#form-rsvp .field {
+    display: block;
+
+    margin: 0 0 var(--s3);
+    padding: 0;
+
+    border: 0;
+}
+
+#form-rsvp label,
+#form-rsvp legend {
+    display: block;
+
+    margin-bottom: var(--s1);
+    padding: 0;
+
+    color: var(--hijau);
+    font-size: var(--f0);
+    font-weight: 600;
+}
+
+#form-rsvp input[type="text"],
+#form-rsvp input[type="number"],
+#form-rsvp textarea {
+    width: 100%;
+    padding: var(--s2);
+
+    border: 1px solid var(--marun);
+    border-radius: 2px;
+
+    background: #fff;
+    color: var(--teks);
+
+    font: 500 var(--f0) / 1.4 "Cormorant Garamond", serif;
+}
+
+#form-rsvp textarea {
+    resize: vertical;
+}
+
+#form-rsvp input:focus-visible,
+#form-rsvp textarea:focus-visible {
+    outline: 2px solid var(--kuning);
+    outline-offset: 2px;
+}
+
+#form-rsvp .pilihan {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2) var(--s4);
+}
+
+#form-rsvp .pilihan label {
+    display: flex;
+    align-items: center;
+    gap: var(--s1);
+
+    margin: 0;
+
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#form-rsvp input[type="radio"] {
+    accent-color: var(--hijau);
+}
+
+#form-rsvp button {
+    width: 100%;
+    margin-top: var(--s3);
+}
+
+#rsvp .pesan-rsvp {
+    max-width: 34em;
+    margin: 0 auto var(--s4);
+    padding: var(--s2) var(--s3);
+
+    border: 1px solid var(--marun);
+    border-radius: 2px;
+
+    font-size: var(--f0);
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+#rsvp .pesan-ok {
+    border-color: var(--kuning);
+    background: var(--hijau);
+    color: var(--kapur);
+}
+
+#rsvp .pesan-error {
+    border-color: #8c2f39;
+    background: #f6e9ea;
+    color: #6b1f28;
+}
+
+#form-rsvp .jebakan {
+    position: absolute;
+    left: -9999px;
+
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
 }
 
 /* Mobile */
