@@ -1,2 +1,4 @@
 .env
 data/
+media/unggahan/*
+!media/unggahan/.htaccess

@@ -35,6 +35,21 @@ try {
     $total_hal = 1;
 }
 
+try {
+    $pengantin = ambil_pengantin();
+} catch (Throwable $ex) {
+    error_log('Gagal memuat pengantin: ' . $ex->getMessage());
+    $pengantin = [];
+}
+
+function orang_tua(array $p): string
+{
+    $o = [];
+    if ($p['ayah'] !== '') $o[] = 'Bapak ' . $p['ayah'];
+    if ($p['ibu'] !== '')  $o[] = 'Ibu ' . $p['ibu'];
+    return implode(' & ', $o);
+}
+
 $label_status = ['hadir' => 'Hadir', 'ragu' => 'Belum pasti', 'tidak' => 'Tidak hadir'];
 $bulan = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -111,28 +126,22 @@ function tgl_ucapan(string $utc, array $bulan): string
 
             <img id="ornamen-tengah" src="media/ornamen-lurus-tengah-1.png" alt="">
 
-            <div id="mempelai-pria">
+            <?php foreach (['pria' => 'Putra dari', 'wanita' => 'Putri dari'] as $jenis => $label): ?>
+                <?php if (empty($pengantin[$jenis])) continue; $p = $pengantin[$jenis]; ?>
+                <div id="mempelai-<?= $jenis ?>">
 
-                <img class="foto-mempelai" src="media/perkenalan-mempelai-pria.jpeg" alt="Malik Pratama">
+                    <img class="foto-mempelai" src="<?= e($p['foto']) ?>" alt="<?= e($p['nama']) ?>">
 
-                <p>
-                    Malik Pratama, S.T<br>
-                    Putra pertama dari<br>
-                    Bapak Hendra Pratama & Ibu Siti Nurhaliza
-                </p>
+                    <p>
+                        <?= e($p['nama']) ?><br>
+                        <?php if (orang_tua($p) !== ''): ?>
+                            <?= $label ?><br>
+                            <?= e(orang_tua($p)) ?>
+                        <?php endif; ?>
+                    </p>
 
-            </div>
-            <div id="mempelai-wanita">
-
-                <img class="foto-mempelai" src="media/perkenalan-mempelai-wanita.jpeg" alt="Harsya Rahma">
-
-                <p>
-                    Harsya Rahma, S.H<br>
-                    Putri kedua dari<br>
-                    Bapak Ahmad Fauzi & Ibu Dewi Lestari
-                </p>
-
-            </div>
+                </div>
+            <?php endforeach; ?>
 
         </section>
 
