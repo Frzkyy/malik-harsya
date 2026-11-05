@@ -34,5 +34,25 @@ function db(): PDO
     ");
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_rsvp_created ON rsvp (created_at DESC)');
 
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS admin (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            username      TEXT    NOT NULL UNIQUE,
+            password_hash TEXT    NOT NULL,
+            role          TEXT    NOT NULL DEFAULT 'admin' CHECK (role IN ('superadmin','admin')),
+            created_at    TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+
+    // Seed superadmin pertama dari .env, hanya kalau tabel admin masih kosong.
+    if ((int) $pdo->query('SELECT COUNT(*) FROM admin')->fetchColumn() === 0) {
+        $u = strtolower(trim((string) env('SUPERADMIN_USER', '')));
+        $p = (string) env('SUPERADMIN_PASSWORD', '');
+        if ($u !== '' && $p !== '') {
+            $pdo->prepare('INSERT INTO admin (username, password_hash, role) VALUES (?, ?, ?)')
+                ->execute([$u, password_hash($p, PASSWORD_DEFAULT), 'superadmin']);
+        }
+    }
+
     return $pdo;
 }

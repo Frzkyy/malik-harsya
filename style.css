@@ -742,6 +742,120 @@ h1 {
     overflow: hidden;
 }
 
+/* Daftar ucapan RSVP */
+
+#daftar-ucapan {
+    max-width: 34em;
+    margin: var(--s6) auto 0;
+
+    text-align: left;
+}
+
+#daftar-ucapan h2 {
+    margin-bottom: var(--s3);
+
+    color: var(--hijau);
+    font-size: var(--f2);
+    text-align: center;
+}
+
+.ucapan-kosong {
+    color: var(--marun);
+    text-align: center;
+}
+
+.ucapan-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.ucapan-item {
+    padding: var(--s2) var(--s3);
+
+    border: 1px solid var(--marun);
+    border-left: 3px solid var(--kuning);
+    border-radius: 2px;
+
+    background: #fff;
+}
+
+.ucapan-kepala {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s1) var(--s2);
+
+    margin-bottom: var(--s1);
+}
+
+.ucapan-nama {
+    color: var(--hijau);
+    font-size: var(--f1);
+    overflow-wrap: anywhere;
+}
+
+.ucapan-status {
+    padding: 2px var(--s1);
+
+    border: 1px solid var(--marun);
+    border-radius: 2px;
+
+    color: var(--marun);
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.ucapan-status.status-hadir {
+    border-color: var(--hijau);
+    background: var(--hijau);
+    color: var(--kapur);
+}
+
+.ucapan-isi {
+    margin: 0 0 var(--s1);
+
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.ucapan-waktu {
+    color: var(--marun);
+    font-size: 0.85em;
+}
+
+.ucapan-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s2);
+
+    margin-top: var(--s4);
+}
+
+.ucapan-nav .btn {
+    margin-top: 0;
+    padding: var(--s1) var(--s3);
+
+    font-size: var(--f0);
+    text-decoration: none;
+}
+
+.ucapan-nav .btn.nonaktif {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.ucapan-hal {
+    color: var(--marun);
+    font-weight: 600;
+}
+
 /* Mobile */
 
 @media (max-width: 700px) {
@@ -803,4 +917,183 @@ h1 {
     * {
         transition: none !important;
     }
+}
+/* Login / Admin */
+
+#login {
+    max-width: 24em;
+    margin: 0 auto;
+    padding: var(--s7) var(--pad);
+
+    text-align: center;
+}
+
+#login h1 {
+    color: var(--hijau);
+    font-size: var(--f3);
+}
+
+#login .login-sub {
+    margin: var(--s1) 0 var(--s4);
+
+    color: var(--marun);
+    font-size: var(--f1);
+}
+
+#login .field {
+    margin-bottom: var(--s3);
+
+    text-align: left;
+}
+
+#login label {
+    display: block;
+
+    margin-bottom: var(--s1);
+
+    color: var(--hijau);
+    font-weight: 600;
+}
+
+#login input[type="text"],
+#login input[type="password"] {
+    width: 100%;
+    padding: var(--s2);
+
+    border: 1px solid var(--marun);
+    border-radius: 2px;
+
+    background: #fff;
+    color: var(--teks);
+
+    font: 500 var(--f0) / 1.4 "Cormorant Garamond", serif;
+}
+
+#login input:focus-visible {
+    outline: 2px solid var(--kuning);
+    outline-offset: 2px;
+}
+
+#login button {
+    width: 100%;
+    margin-top: var(--s2);
+}
+
+#login .pesan-login {
+    margin: 0 0 var(--s3);
+    padding: var(--s2) var(--s3);
+
+    border: 1px solid #8c2f39;
+    border-radius: 2px;
+
+    background: #f6e9ea;
+    color: #6b1f28;
+
+    font-weight: 600;
+}
+
+#login .admin-stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s1);
+
+    margin: 0 0 var(--s4);
+    padding: 0;
+
+    color: var(--teks);
+    list-style: none;
+}
+
+#login .admin-stat strong {
+    color: var(--hijau);
+    font-size: var(--f2);
+}
+
+#login.lebar {
+    max-width: 34em;
+}
+
+#login h2 {
+    margin: var(--s5) 0 var(--s3);
+
+    color: var(--hijau);
+    font-size: var(--f2);
+}
+
+#login .login-sub a {
+    color: var(--marun);
+}
+
+#login .pesan-sukses {
+    border-color: var(--kuning);
+    background: var(--hijau);
+    color: var(--kapur);
+}
+
+.badge-role {
+    display: inline-block;
+
+    padding: 2px var(--s1);
+
+    border: 1px solid var(--kuning);
+    border-radius: 2px;
+
+    color: var(--kuning);
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.daftar-admin {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+    text-align: left;
+}
+
+.admin-baris {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s2);
+
+    padding: var(--s2) var(--s3);
+
+    border: 1px solid var(--marun);
+    border-radius: 2px;
+
+    background: #fff;
+}
+
+.admin-info strong {
+    margin-right: var(--s1);
+
+    color: var(--hijau);
+    font-size: var(--f1);
+}
+
+.admin-aksi {
+    display: flex;
+    gap: var(--s1);
+}
+
+#login .admin-aksi input {
+    width: 10em;
+    padding: var(--s1);
+}
+
+#login .admin-aksi button {
+    width: auto;
+    margin-top: 0;
+    padding: var(--s1) var(--s2);
+}
+
+#login .btn-bahaya {
+    border-color: #8c2f39;
+    background: #8c2f39;
 }

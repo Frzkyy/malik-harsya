@@ -1,9 +1,53 @@
 <?php
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/db.php';
 
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 $old = $flash['old'] ?? [];
+
+// Daftar ucapan: maksimal 5 per halaman, sisanya lewat tombol Berikutnya.
+$per_hal     = 5;
+$hal         = max(1, (int) ($_GET['hal'] ?? 1));
+$total_ucapan = 0;
+$daftar_ucapan = [];
+
+try {
+    $total_ucapan = (int) db()->query(
+        "SELECT COUNT(*) FROM rsvp WHERE ucapan IS NOT NULL AND ucapan <> ''"
+    )->fetchColumn();
+
+    $total_hal = max(1, (int) ceil($total_ucapan / $per_hal));
+    $hal       = min($hal, $total_hal);
+
+    $stmt = db()->prepare(
+        "SELECT nama, status, ucapan, created_at FROM rsvp
+         WHERE ucapan IS NOT NULL AND ucapan <> ''
+         ORDER BY created_at DESC, id DESC
+         LIMIT :lim OFFSET :off"
+    );
+    $stmt->bindValue(':lim', $per_hal, PDO::PARAM_INT);
+    $stmt->bindValue(':off', ($hal - 1) * $per_hal, PDO::PARAM_INT);
+    $stmt->execute();
+    $daftar_ucapan = $stmt->fetchAll();
+} catch (Throwable $ex) {
+    error_log('Gagal memuat ucapan: ' . $ex->getMessage());
+    $total_hal = 1;
+}
+
+$label_status = ['hadir' => 'Hadir', 'ragu' => 'Belum pasti', 'tidak' => 'Tidak hadir'];
+$bulan = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+function tgl_ucapan(string $utc, array $bulan): string
+{
+    try {
+        $d = new DateTime($utc, new DateTimeZone('UTC'));
+        $d->setTimezone(new DateTimeZone('Asia/Jakarta'));
+        return $d->format('j') . ' ' . $bulan[(int) $d->format('n')] . ' ' . $d->format('Y');
+    } catch (Throwable $ex) {
+        return '';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -357,6 +401,47 @@ $old = $flash['old'] ?? [];
                 <button type="submit">Kirim RSVP</button>
 
             </form>
+
+            <div id="daftar-ucapan">
+
+                <h2>Ucapan &amp; Doa<?= $total_ucapan ? ' (' . $total_ucapan . ')' : '' ?></h2>
+
+                <?php if (!$daftar_ucapan): ?>
+                    <p class="ucapan-kosong">Belum ada ucapan. Jadilah yang pertama menyampaikan doa.</p>
+                <?php else: ?>
+                    <ul class="ucapan-list">
+                        <?php foreach ($daftar_ucapan as $u): ?>
+                            <li class="ucapan-item">
+                                <div class="ucapan-kepala">
+                                    <strong class="ucapan-nama"><?= e($u['nama']) ?></strong>
+                                    <span class="ucapan-status status-<?= e($u['status']) ?>"><?= e($label_status[$u['status']] ?? '') ?></span>
+                                </div>
+                                <p class="ucapan-isi"><?= nl2br(e($u['ucapan'])) ?></p>
+                                <time class="ucapan-waktu"><?= e(tgl_ucapan($u['created_at'], $bulan)) ?></time>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+
+                    <?php if ($total_hal > 1): ?>
+                        <nav class="ucapan-nav" aria-label="Halaman ucapan">
+                            <?php if ($hal > 1): ?>
+                                <a class="btn" href="?hal=<?= $hal - 1 ?>#daftar-ucapan" rel="prev">&larr; Sebelumnya</a>
+                            <?php else: ?>
+                                <span class="btn nonaktif">&larr; Sebelumnya</span>
+                            <?php endif; ?>
+
+                            <span class="ucapan-hal"><?= $hal ?> / <?= $total_hal ?></span>
+
+                            <?php if ($hal < $total_hal): ?>
+                                <a class="btn" href="?hal=<?= $hal + 1 ?>#daftar-ucapan" rel="next">Berikutnya &rarr;</a>
+                            <?php else: ?>
+                                <span class="btn nonaktif">Berikutnya &rarr;</span>
+                            <?php endif; ?>
+                        </nav>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+            </div>
 
         </section>
 

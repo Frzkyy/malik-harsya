@@ -46,3 +46,47 @@ function e(?string $s): string
 {
     return htmlspecialchars((string) $s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
+
+function is_admin(): bool
+{
+    return !empty($_SESSION['admin_id']);
+}
+
+function is_superadmin(): bool
+{
+    return is_admin() && ($_SESSION['admin_role'] ?? '') === 'superadmin';
+}
+
+// Pastikan akun di sesi masih ada di database (admin yang dihapus langsung ditendang).
+function admin_masih_ada(): bool
+{
+    require_once __DIR__ . '/db.php';
+    try {
+        $s = db()->prepare('SELECT role FROM admin WHERE id = ?');
+        $s->execute([(int) $_SESSION['admin_id']]);
+        $role = $s->fetchColumn();
+        if (!$role) return false;
+        $_SESSION['admin_role'] = $role;
+        return true;
+    } catch (Throwable $ex) {
+        return false;
+    }
+}
+
+function require_admin(): void
+{
+    if (!is_admin() || !admin_masih_ada()) {
+        unset($_SESSION['admin_id'], $_SESSION['admin_user'], $_SESSION['admin_role']);
+        header('Location: login.php', true, 303);
+        exit;
+    }
+}
+
+function require_superadmin(): void
+{
+    require_admin();
+    if (!is_superadmin()) {
+        header('Location: admin.php', true, 303);
+        exit;
+    }
+}

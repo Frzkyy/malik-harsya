@@ -1,0 +1,8 @@
+ini dashboard nanti ada 4 panel
+
+    pengantin (bisa mengganti nama pria/wanita serta ibubu/ayah dan alamat, dibawahnya gk tau apa tu)
+    tamu udnangan (intinya nanti bisa www.web/nama-tamu, nah set nya disini, bisa lihat, bisa tambah nama, lihat status, edit (jadi nanti awal awal bisa "pseudo-login" dimana nanti masukan username aja, dan kalau gk ada bisa guest tapi gk bisa rsvp)
+    daftar hadir (siapa aja yg hadir)
+    pengaturan (disini lah ngatur siapa admin)
+
+sekarn glu fokus buat yg 1 dlu, itu ada mockupnya

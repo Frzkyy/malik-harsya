@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# URL pendek: /login dan /admin
+RewriteRule ^login/?$ login.php [L]
+RewriteRule ^admin/?$ admin.php [L]
+
+# Jangan biarkan database bisa diunduh lewat browser
+RewriteRule ^data/ - [F]
