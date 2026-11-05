@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/db.php';
 
 require_superadmin();
 
@@ -85,7 +85,7 @@ $daftar = db()->query(
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 
     <title>Kelola Admin</title>
 </head>
@@ -95,7 +95,7 @@ $daftar = db()->query(
 
         <h1>Kelola Admin</h1>
 
-        <p class="login-sub"><a href="admin.php">&larr; Kembali</a></p>
+        <p class="login-sub"><a href="index.php?panel=pengaturan">&larr; Kembali</a></p>
 
         <?php if ($flash): ?>
             <p class="pesan-login <?= $flash['tipe'] === 'ok' ? 'pesan-sukses' : '' ?>" role="status"><?= e($flash['pesan']) ?></p>

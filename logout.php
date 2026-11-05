@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_valid($_POST['csrf'] ?? null)) {
     $_SESSION = [];
@@ -12,5 +12,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_valid($_POST['csrf'] ?? null))
     exit;
 }
 
-header('Location: admin.php', true, 303);
+header('Location: dashboard/', true, 303);
 exit;

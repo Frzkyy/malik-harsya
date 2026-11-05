@@ -6,7 +6,7 @@ function db(): PDO
     static $pdo = null;
     if ($pdo) return $pdo;
 
-    $path = env('DB_PATH', __DIR__ . '/data/rsvp.db');
+    $path = env('DB_PATH', APP_ROOT . '/data/rsvp.db');
     $dir  = dirname($path);
 
     if (!is_dir($dir) && !mkdir($dir, 0750, true) && !is_dir($dir)) {

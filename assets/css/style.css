@@ -61,7 +61,7 @@ img {
     position: relative;
     height: clamp(650px, 88vh, 940px);
     overflow: hidden;
-    background: url("media/belakang-belakangan-putih.jpeg") center / cover;
+    background: url("../../media/belakang-belakangan-putih.jpeg") center / cover;
 }
 
 #cover-image::after {
@@ -926,6 +926,22 @@ h1 {
     padding: var(--s7) var(--pad);
 
     text-align: center;
+}
+
+#login .kembali-undangan {
+    display: inline-block;
+
+    margin-bottom: var(--s3);
+
+    color: var(--marun);
+    font-size: var(--f1);
+    text-decoration: none;
+}
+
+#login .kembali-undangan:hover,
+#login .kembali-undangan:focus-visible {
+    color: var(--hijau);
+    text-decoration: underline;
 }
 
 #login h1 {

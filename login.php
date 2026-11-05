@@ -1,9 +1,9 @@
 <?php
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/db.php';
 
 if (is_admin()) {
-    header('Location: admin.php', true, 303);
+    header('Location: dashboard/', true, 303);
     exit;
 }
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['admin_user'] = $row['username'];
             $_SESSION['admin_role'] = $row['role'];
             unset($_SESSION['login_gagal'], $_SESSION['login_lock'], $_SESSION['csrf']);
-            header('Location: admin.php', true, 303);
+            header('Location: dashboard/', true, 303);
             exit;
         }
 
@@ -66,13 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 
     <title>Login Admin</title>
 </head>
 
 <body>
     <main id="login">
+
+        <a class="kembali-undangan" href="./">&larr; Kembali ke undangan</a>
 
         <h1>Login</h1>
 

@@ -1,7 +1,7 @@
 <?php
 // Handler POST untuk panel Pengantin di dashboard admin (hanya teks).
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/db.php';
 
 require_admin();
 
@@ -9,12 +9,12 @@ function balik_pengantin(string $tipe, string $pesan, string $edit = ''): never
 {
     $_SESSION['flash_pengantin'] = ['tipe' => $tipe, 'pesan' => $pesan];
     $q = $edit !== '' ? '&edit=' . $edit : '';
-    header('Location: admin.php?panel=pengantin' . $q, true, 303);
+    header('Location: index.php?panel=pengantin' . $q, true, 303);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: admin.php?panel=pengantin', true, 303);
+    header('Location: index.php?panel=pengantin', true, 303);
     exit;
 }
 

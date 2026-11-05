@@ -1,0 +1,98 @@
+<?php
+// Panel Pengantin: data mempelai + galeri. Dipanggil dari dashboard/index.php.
+
+$pengantin = [];
+$galeri    = [];
+
+try {
+    $pengantin = ambil_pengantin();
+    $galeri = db()->query('SELECT id, file FROM galeri ORDER BY id')->fetchAll();
+} catch (Throwable $ex) {
+    error_log('Panel pengantin gagal memuat data: ' . $ex->getMessage());
+}
+
+$edit = (string) ($_GET['edit'] ?? '');
+if (!in_array($edit, ['pria', 'wanita'], true)) $edit = '';
+
+$judul_jenis = ['pria' => 'Pengantin Pria', 'wanita' => 'Pengantin Wanita'];
+?>
+<div class="grid-pengantin">
+    <?php foreach ($judul_jenis as $jenis => $judul):
+        $p = $pengantin[$jenis] ?? null;
+        if (!$p) continue;
+        $mengedit = $edit === $jenis;
+    ?>
+        <section class="kartu profil" id="profil-<?= $jenis ?>" aria-labelledby="h-<?= $jenis ?>">
+
+            <div class="foto">
+                <img src="../<?= e($p['foto']) ?>" alt="Foto <?= e($judul) ?>">
+            </div>
+
+            <?php if (!$mengedit): ?>
+
+                <div class="data">
+                    <div class="kepala">
+                        <h2 id="h-<?= $jenis ?>"><?= e($judul) ?></h2>
+                        <a class="tombol" href="index.php?panel=pengantin&amp;edit=<?= $jenis ?>#profil-<?= $jenis ?>">Edit</a>
+                    </div>
+                    <dl>
+                        <dt>Nama</dt>   <dd><?= e($p['nama']) ?: '<span class="kosong">-</span>' ?></dd>
+                        <dt>Ibu</dt>    <dd><?= e($p['ibu']) ?: '<span class="kosong">-</span>' ?></dd>
+                        <dt>Ayah</dt>   <dd><?= e($p['ayah']) ?: '<span class="kosong">-</span>' ?></dd>
+                        <dt>Alamat</dt> <dd><?= e($p['alamat']) ?: '<span class="kosong">-</span>' ?></dd>
+                    </dl>
+                </div>
+
+            <?php else: ?>
+
+                <form class="data" action="pengantin_aksi.php" method="post">
+                    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                    <input type="hidden" name="aksi" value="simpan">
+                    <input type="hidden" name="jenis" value="<?= $jenis ?>">
+
+                    <div class="kepala">
+                        <h2 id="h-<?= $jenis ?>"><?= e($judul) ?></h2>
+                    </div>
+
+                    <label>Nama
+                        <input type="text" name="nama" value="<?= e($p['nama']) ?>" maxlength="100" required autofocus>
+                    </label>
+                    <label>Ibu
+                        <input type="text" name="ibu" value="<?= e($p['ibu']) ?>" maxlength="100">
+                    </label>
+                    <label>Ayah
+                        <input type="text" name="ayah" value="<?= e($p['ayah']) ?>" maxlength="100">
+                    </label>
+                    <label>Alamat
+                        <textarea name="alamat" rows="3" maxlength="300"><?= e($p['alamat']) ?></textarea>
+                    </label>
+                    <div class="aksi">
+                        <button type="submit" class="tombol utama">Simpan</button>
+                        <a class="tombol" href="index.php?panel=pengantin#profil-<?= $jenis ?>">Batal</a>
+                    </div>
+                </form>
+
+            <?php endif; ?>
+        </section>
+    <?php endforeach; ?>
+
+    <section class="kartu galeri semua" aria-label="Galeri">
+
+        <div class="kepala">
+            <h3>Galeri <span class="hitung"><?= count($galeri) ?></span></h3>
+        </div>
+
+        <?php if ($galeri): ?>
+            <ul class="kolase">
+                <?php foreach ($galeri as $g): ?>
+                    <li>
+                        <img src="../<?= e($g['file']) ?>" alt="" loading="lazy">
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p class="kosong-galeri">Belum ada foto.</p>
+        <?php endif; ?>
+
+    </section>
+</div>

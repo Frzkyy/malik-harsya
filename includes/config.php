@@ -1,8 +1,11 @@
 <?php
 // Bootstrap: baca .env, mulai session, helper CSRF & escape.
+// Folder ini (includes/) tidak untuk diakses browser; root proyek = satu tingkat di atasnya.
+
+define('APP_ROOT', dirname(__DIR__));
 
 (function () {
-    $file = __DIR__ . '/.env';
+    $file = APP_ROOT . '/.env';
     if (!is_readable($file)) return;
 
     foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
@@ -77,7 +80,7 @@ function require_admin(): void
 {
     if (!is_admin() || !admin_masih_ada()) {
         unset($_SESSION['admin_id'], $_SESSION['admin_user'], $_SESSION['admin_role']);
-        header('Location: login.php', true, 303);
+        header('Location: ../login.php', true, 303);
         exit;
     }
 }
@@ -86,7 +89,7 @@ function require_superadmin(): void
 {
     require_admin();
     if (!is_superadmin()) {
-        header('Location: admin.php', true, 303);
+        header('Location: index.php', true, 303);
         exit;
     }
 }
