@@ -15,6 +15,10 @@ if ($path === '/login' || $path === '/login/') {
     require __DIR__ . '/login.php';
     return true;
 }
+if ($path === '/masuk' || $path === '/masuk/') {
+    require __DIR__ . '/masuk.php';
+    return true;
+}
 if ($path === '/admin' || $path === '/admin/') {
     header('Location: /dashboard/', true, 301);
     return true;

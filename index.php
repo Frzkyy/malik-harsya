@@ -36,14 +36,45 @@ try {
     $total_hal = 1;
 }
 
-// Link pribadi: /nama-tamu atau ?tamu=nama-tamu. Slug tidak dikenal = tamu umum.
+// Pseudo-login tamu (satu halaman): gerbang layar penuh yang "naik" setelah tamu masuk.
+//  - sudah ada sesi tamu / "lihat sebagai tamu" -> tanpa gerbang
+//  - buka lewat link pribadi (/nama-tamu, ?tamu=) -> otomatis masuk, gerbang menyambut dengan tombol "Buka Undangan"
+//  - selain itu -> gerbang berisi form nama + "Lihat sebagai tamu"
 $tamu = null;
+$guest = false;
+$gerbang = 'form';        // 'form' | 'sambut' | '' (tanpa gerbang)
+$gerbang_error = (string) ($_SESSION['masuk_error'] ?? '');
+unset($_SESSION['masuk_error']);
+
 try {
-    $tamu = cari_tamu((string) ($_GET['tamu'] ?? ''));
+    $slug_link = trim((string) ($_GET['tamu'] ?? ''));
+    if ($slug_link !== '') {
+        $tamu = cari_tamu($slug_link);
+        if ($tamu) {
+            masuk_sebagai_tamu($tamu);
+            $gerbang = 'sambut';
+        } else {
+            $gerbang_error = 'Link undangan tidak dikenali. Silakan masukkan nama Anda.';
+        }
+    } elseif (!empty($_SESSION['tamu_id'])) {
+        $s = db()->prepare('SELECT id, nama, slug FROM tamu WHERE id = ?');
+        $s->execute([(int) $_SESSION['tamu_id']]);
+        $tamu = $s->fetch() ?: null;
+        if ($tamu) {
+            $gerbang = '';
+        } else {
+            keluar_tamu();   // tamu sudah dihapus admin
+        }
+    }
 } catch (Throwable $ex) {
     error_log('Gagal memuat tamu: ' . $ex->getMessage());
 }
-$nama_tamu = $tamu['nama'] ?? 'Tamu Undangan';
+
+if (!$tamu && !empty($_SESSION['tamu_guest'])) {
+    $guest = true;
+    $gerbang = '';
+}
+$nama_tamu = $tamu['nama'] ?? 'Bapak/Ibu';
 
 $galeri = [];
 try {
@@ -111,7 +142,40 @@ function tgl_ucapan(string $utc, array $bulan): string
     <title><?= e($nama_pria) ?> &amp; <?= e($nama_wanita) ?></title>
 </head>
 
-<body>
+<body<?= $gerbang !== '' ? ' class="terkunci"' : '' ?>>
+
+    <?php if ($gerbang !== ''): ?>
+        <section id="gerbang" aria-label="Masuk undangan">
+            <div class="gerbang-isi">
+                <p class="gerbang-judul">The Wedding of</p>
+                <p class="gerbang-nama"><?= e($nama_pria) ?> <span>&amp;</span> <?= e($nama_wanita) ?></p>
+
+                <p id="gerbang-error" class="pesan-login" role="alert" <?= $gerbang_error === '' ? 'hidden' : '' ?>><?= e($gerbang_error) ?></p>
+
+                <?php if ($gerbang === 'sambut'): ?>
+                    <p class="gerbang-sapa">Kepada Yth.<br><strong><?= e($nama_tamu) ?></strong></p>
+                    <button type="button" id="gerbang-buka">Buka Undangan</button>
+                <?php else: ?>
+                    <p class="gerbang-sapa">Masukkan nama Anda sebagaimana tertulis di undangan.</p>
+
+                    <form id="gerbang-form" action="masuk.php" method="post">
+                        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                        <input type="hidden" name="aksi" value="masuk">
+                        <label for="gerbang-nama" class="sr-only">Nama</label>
+                        <input type="text" id="gerbang-nama" name="nama" maxlength="100" placeholder="Nama Anda" autocomplete="off" required>
+                        <button type="submit">Masuk</button>
+                    </form>
+
+                    <form id="gerbang-guest" action="masuk.php" method="post">
+                        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                        <input type="hidden" name="aksi" value="guest">
+                        <button type="submit" class="btn-sekunder">Lihat sebagai tamu</button>
+                    </form>
+                <?php endif; ?>
+            </div>
+        </section>
+    <?php endif; ?>
+
     <main id="bungkus">
 
         <section id="cover-image">
@@ -126,6 +190,7 @@ function tgl_ucapan(string $utc, array $bulan): string
             <div id="cover-text">
                 <p id="cover-invitation">Dengan hormat, kami mengundang</p>
                 <p id="cover-name"><?= e($nama_tamu) ?></p>
+                <a class="ganti-tamu" id="ganti-tamu" href="masuk.php?keluar=1"><?= $tamu ? 'Bukan Anda? Ganti' : 'Masuk dengan nama Anda' ?></a>
             </div>
 
             <p id="cover-date">17 Agustus 1945</p>
@@ -423,12 +488,9 @@ function tgl_ucapan(string $utc, array $bulan): string
                 </p>
             <?php endif; ?>
 
-            <form id="form-rsvp" action="submit.php" method="post">
+            <form id="form-rsvp"<?= $tamu ? '' : ' hidden' ?> action="submit.php" method="post">
 
                 <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
-                <?php if ($tamu): ?>
-                    <input type="hidden" name="tamu" value="<?= e($tamu['slug']) ?>">
-                <?php endif; ?>
 
                 <div class="jebakan" aria-hidden="true">
                     <label for="rsvp-website">Website</label>
@@ -463,6 +525,11 @@ function tgl_ucapan(string $utc, array $bulan): string
                 <button type="submit">Kirim RSVP</button>
 
             </form>
+
+            <div class="rsvp-terkunci" id="rsvp-terkunci"<?= $tamu ? ' hidden' : '' ?>>
+                    <p>RSVP hanya bisa diisi oleh tamu yang diundang. Silakan masuk dengan nama Anda.</p>
+                    <a class="btn" href="masuk.php?keluar=1" id="rsvp-masuk">Masuk</a>
+                </div>
 
             <div id="daftar-ucapan">
 
@@ -508,6 +575,63 @@ function tgl_ucapan(string $utc, array $bulan): string
         </section>
 
     </main>
+
+    <script>
+    // Gerbang tamu: kirim nama lewat fetch, lalu gerbang naik ke atas membuka undangan.
+    (function () {
+        var gerbang = document.getElementById('gerbang');
+        if (!gerbang) return;
+
+        var err = document.getElementById('gerbang-error');
+        var form = document.getElementById('gerbang-form');
+        var guest = document.getElementById('gerbang-guest');
+        var buka = document.getElementById('gerbang-buka');
+
+        function tampilError(t) { err.textContent = t; err.hidden = !t; }
+
+        function naik() {
+            gerbang.classList.add('naik');
+            document.body.classList.remove('terkunci');
+            window.scrollTo(0, 0);
+            // Cadangan kalau animasi dimatikan (reduced motion): tetap disingkirkan.
+            setTimeout(function () { gerbang.remove(); }, 1100);
+        }
+
+        function terapkan(d) {
+            document.getElementById('cover-name').textContent = d.nama;
+            var g = document.getElementById('ganti-tamu');
+            if (g) g.textContent = d.mode === 'tamu' ? 'Bukan Anda? Ganti' : 'Masuk dengan nama Anda';
+
+            var f = document.getElementById('form-rsvp');
+            var k = document.getElementById('rsvp-terkunci');
+            if (f) f.hidden = d.mode !== 'tamu';
+            if (k) k.hidden = d.mode === 'tamu';
+            var n = document.getElementById('rsvp-nama');
+            if (n && d.mode === 'tamu' && !n.value) n.value = d.nama;
+        }
+
+        function kirim(el) {
+            el.addEventListener('submit', function (e) {
+                e.preventDefault();
+                tampilError('');
+                var tombol = el.querySelector('button');
+                tombol.disabled = true;
+                fetch('masuk.php', { method: 'POST', body: new FormData(el), headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
+                    .then(function (r) { return r.json(); })
+                    .then(function (d) {
+                        if (d.ok) { terapkan(d); naik(); } else { tampilError(d.pesan || 'Gagal masuk.'); }
+                    })
+                    .catch(function () { tampilError('Tidak bisa terhubung. Coba lagi.'); })
+                    .then(function () { tombol.disabled = false; });
+            });
+        }
+
+        if (form) kirim(form);
+        if (guest) kirim(guest);
+        if (buka) buka.addEventListener('click', naik);
+        if (form) document.getElementById('gerbang-nama').focus();
+    })();
+    </script>
 
     <script>
     (function () {

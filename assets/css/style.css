@@ -1234,3 +1234,187 @@ h1 {
     border-color: #8c2f39;
     background: #8c2f39;
 }
+
+/* Gerbang masuk tamu (overlay layar penuh yang naik setelah masuk) */
+
+body.terkunci {
+    overflow: hidden;
+}
+
+#gerbang {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: var(--s3);
+    overflow-y: auto;
+
+    background: var(--hijau);
+    color: var(--kapur);
+
+    text-align: center;
+
+    transition: transform .95s cubic-bezier(.77, 0, .18, 1);
+}
+
+#gerbang.naik {
+    transform: translateY(-100%);
+}
+
+.gerbang-isi {
+    width: 100%;
+    max-width: 26em;
+    margin: auto;
+}
+
+.gerbang-judul {
+    color: var(--kuning);
+    font-size: var(--f1);
+    letter-spacing: .08em;
+}
+
+.gerbang-nama {
+    margin: var(--s1) 0 var(--s4);
+
+    font-family: "Great Vibes", cursive;
+    font-size: clamp(48px, 12vw, 84px);
+    line-height: 1.1;
+}
+
+.gerbang-nama span {
+    color: var(--kuning);
+    font-size: .6em;
+}
+
+.gerbang-sapa {
+    margin-bottom: var(--s3);
+
+    font-size: var(--f1);
+    line-height: 1.4;
+}
+
+.gerbang-sapa strong {
+    display: block;
+    margin-top: var(--s1);
+
+    font-size: var(--f2);
+    font-weight: 600;
+}
+
+#gerbang input[type="text"] {
+    width: 100%;
+    padding: var(--s2);
+
+    border: 1px solid var(--kuning);
+    border-radius: 2px;
+
+    background: rgba(255, 255, 255, .08);
+    color: var(--kapur);
+
+    font: 500 var(--f0) / 1.4 "Cormorant Garamond", serif;
+    text-align: center;
+}
+
+#gerbang input[type="text"]::placeholder {
+    color: rgba(242, 243, 240, .55);
+}
+
+#gerbang input:focus-visible {
+    outline: 2px solid var(--kuning);
+    outline-offset: 2px;
+}
+
+#gerbang button {
+    width: 100%;
+    margin-top: var(--s2);
+
+    border-color: var(--kuning);
+    background: var(--kuning);
+    color: var(--hijau);
+}
+
+#gerbang button:hover {
+    border-color: var(--kapur);
+    background: var(--kapur);
+}
+
+#gerbang button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+#gerbang .btn-sekunder {
+    background: transparent;
+    color: var(--kapur);
+}
+
+#gerbang .btn-sekunder:hover {
+    background: var(--kapur);
+    color: var(--hijau);
+}
+
+#gerbang #gerbang-buka {
+    width: auto;
+    margin-top: var(--s2);
+}
+
+#gerbang .pesan-login {
+    margin: 0 0 var(--s3);
+    padding: var(--s2) var(--s3);
+
+    border: 1px solid #f0b4ae;
+    background: #fbe9e7;
+    color: #8a1f17;
+
+    font-size: var(--f0);
+}
+
+#gerbang .pesan-login[hidden] {
+    display: none;
+}
+
+#gerbang-guest {
+    margin-top: var(--s1);
+}
+
+.sr-only {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* Cover: info tamu & catatan RSVP */
+
+.ganti-tamu {
+    margin-top: var(--s1);
+
+    color: var(--marun);
+    font-size: .8em;
+    text-decoration: underline;
+}
+
+.rsvp-terkunci {
+    max-width: 30em;
+    margin: 0 auto;
+    padding: var(--s3);
+
+    border: 1px solid var(--kuning);
+    color: var(--hijau);
+}
+
+.rsvp-terkunci .btn {
+    margin-top: var(--s2);
+}
+
+[hidden] {
+    display: none !important;
+}

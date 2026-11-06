@@ -338,3 +338,23 @@ input:focus-visible, textarea:focus-visible, .tombol:focus-visible, button:focus
     .detail-tamu dl { grid-template-columns: 1fr; gap: 2px; }
     .detail-tamu dt { margin-top: 8px; }
 }
+
+/* Panel Daftar Hadir */
+.rekap-hadir { margin-bottom: 12px; }
+.rekap-hadir .stat { margin: 0; }
+.rekap-hadir small { color: var(--redup); font-weight: 400; }
+
+.tabel-hadir { background: #f5f8fd; padding: 18px 20px; }
+.tabel-hadir .gulung { overflow-x: auto; }
+.tabel-hadir table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px; }
+.tabel-hadir th, .tabel-hadir td { padding: 10px 12px; border: 2px solid #1d2733; }
+.tabel-hadir th { font-weight: 600; text-align: center; }
+.tabel-hadir td.no, .tabel-hadir th.no { width: 56px; text-align: center; }
+.tabel-hadir td.tengah { text-align: center; }
+.tabel-hadir td .status-tamu { min-width: 140px; }
+
+.filter-hadir { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 14px; font-size: 13px; }
+.filter-hadir label { font-weight: 600; }
+.filter-hadir select { padding: 5px 8px; border: 1px solid var(--garis); border-radius: 4px; background: #fff; font: inherit; font-size: 13px; color: var(--teks); }
+.tombol-ungu { padding: 5px 22px; border: 0; border-radius: 4px; background: #5b1fe0; color: #fff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.tombol-ungu:hover { background: #4a17bd; }

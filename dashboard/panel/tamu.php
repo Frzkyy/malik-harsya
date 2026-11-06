@@ -41,23 +41,6 @@ try {
     error_log('Panel tamu gagal memuat data: ' . $ex->getMessage());
 }
 
-function waktu_wib(?string $utc): string
-{
-    if (!$utc) return '-';
-    try {
-        $d = new DateTime($utc, new DateTimeZone('UTC'));
-        $d->setTimezone(new DateTimeZone('Asia/Jakarta'));
-        return $d->format('j M Y, H:i') . ' WIB';
-    } catch (Throwable $ex) {
-        return '-';
-    }
-}
-
-function badge_status(?string $status): string
-{
-    [$label, $kelas] = LABEL_STATUS_TAMU[$status ?? ''] ?? LABEL_STATUS_TAMU[''];
-    return '<span class="status-tamu ' . $kelas . '">' . e($label) . '</span>';
-}
 ?>
 
 <div class="bar-tamu kartu">

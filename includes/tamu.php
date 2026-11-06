@@ -4,7 +4,7 @@
 /** Slug yang tidak boleh dipakai karena bentrok dengan folder/file/rute yang sudah ada. */
 const SLUG_DILARANG = [
     'login', 'logout', 'admin', 'dashboard', 'index', 'submit', 'media', 'assets',
-    'includes', 'data', 'aktivitas', 'env', 'router',
+    'includes', 'data', 'aktivitas', 'env', 'router', 'masuk',
 ];
 
 /** "Said Fairuz Zacky" -> "said-fairuz-zacky" */
@@ -53,3 +53,53 @@ const LABEL_STATUS_TAMU = [
     'ragu'  => ['Mungkin Hadir', 'ragu'],
     ''      => ['Belum Menjawab', 'belum'],
 ];
+
+/** Cari tamu dari yang diketik di halaman masuk: link (slug) atau nama lengkap, tanpa peduli huruf besar/kecil. */
+function cari_tamu_login(string $input): ?array
+{
+    $input = trim($input);
+    if ($input === '' || !preg_match('/^.{1,100}$/su', $input)) return null;
+
+    $s = db()->prepare('SELECT id, nama, slug FROM tamu WHERE slug = ? OR lower(nama) = lower(?) ORDER BY id LIMIT 1');
+    $s->execute([buat_slug($input), $input]);
+    return $s->fetch() ?: null;
+}
+
+/** Tandai sesi sebagai tamu tertentu (pseudo-login: tanpa password). */
+function masuk_sebagai_tamu(array $tamu): void
+{
+    session_regenerate_id(true);
+    $_SESSION['tamu_id'] = (int) $tamu['id'];
+    unset($_SESSION['tamu_guest']);
+}
+
+function masuk_sebagai_guest(): void
+{
+    session_regenerate_id(true);
+    unset($_SESSION['tamu_id']);
+    $_SESSION['tamu_guest'] = true;
+}
+
+function keluar_tamu(): void
+{
+    unset($_SESSION['tamu_id'], $_SESSION['tamu_guest']);
+}
+
+/** UTC dari database -> "6 Nov 2026, 08:24 WIB" */
+function waktu_wib(?string $utc): string
+{
+    if (!$utc) return '-';
+    try {
+        $d = new DateTime($utc, new DateTimeZone('UTC'));
+        $d->setTimezone(new DateTimeZone('Asia/Jakarta'));
+        return $d->format('j M Y, H:i') . ' WIB';
+    } catch (Throwable $ex) {
+        return '-';
+    }
+}
+
+function badge_status(?string $status): string
+{
+    [$label, $kelas] = LABEL_STATUS_TAMU[$status ?? ''] ?? LABEL_STATUS_TAMU[''];
+    return '<span class="status-tamu ' . $kelas . '">' . e($label) . '</span>';
+}
