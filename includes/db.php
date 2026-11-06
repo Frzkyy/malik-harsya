@@ -6,7 +6,12 @@ function db(): PDO
     static $pdo = null;
     if ($pdo) return $pdo;
 
-    $path = env('DB_PATH', APP_ROOT . '/data/rsvp.db');
+    $path = env('DB_PATH', 'data/rsvp.db');
+    // Path relatif dihitung dari root proyek, bukan dari folder script yang sedang jalan
+    // (kalau tidak, dashboard/ akan membuat database sendiri di dashboard/data/).
+    if (!preg_match('#^(/|[A-Za-z]:[\\/])#', $path)) {
+        $path = APP_ROOT . '/' . $path;
+    }
     $dir  = dirname($path);
 
     if (!is_dir($dir) && !mkdir($dir, 0750, true) && !is_dir($dir)) {
@@ -34,6 +39,22 @@ function db(): PDO
     ");
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_rsvp_created ON rsvp (created_at DESC)');
 
+    // Daftar tamu undangan; slug dipakai di link pribadi (/slug atau ?tamu=slug).
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS tamu (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            nama       TEXT    NOT NULL,
+            slug       TEXT    NOT NULL UNIQUE,
+            created_at TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+    // RSVP yang dikirim lewat link tamu ditandai dengan tamu_id (kosong = RSVP umum).
+    $kolom_rsvp = array_column($pdo->query('PRAGMA table_info(rsvp)')->fetchAll(), 'name');
+    if (!in_array('tamu_id', $kolom_rsvp, true)) {
+        $pdo->exec('ALTER TABLE rsvp ADD COLUMN tamu_id INTEGER');
+    }
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_rsvp_tamu ON rsvp (tamu_id)');
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS admin (
             id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,7 +74,8 @@ function db(): PDO
             alamat TEXT NOT NULL DEFAULT '',
             foto   TEXT NOT NULL DEFAULT '',
             foto_lebar  INTEGER NOT NULL DEFAULT 0,
-            foto_tinggi INTEGER NOT NULL DEFAULT 0
+            foto_tinggi INTEGER NOT NULL DEFAULT 0,
+            panggilan   TEXT NOT NULL DEFAULT ''
         )
     ");
     $kolom = array_column($pdo->query('PRAGMA table_info(pengantin)')->fetchAll(), 'name');
@@ -61,6 +83,11 @@ function db(): PDO
         if (!in_array($k, $kolom, true)) {
             $pdo->exec("ALTER TABLE pengantin ADD COLUMN $k INTEGER NOT NULL DEFAULT 0");
         }
+    }
+    if (!in_array('panggilan', $kolom, true)) {
+        $pdo->exec("ALTER TABLE pengantin ADD COLUMN panggilan TEXT NOT NULL DEFAULT ''");
+        // Isi awal = teks yang sebelumnya tertulis langsung di cover.
+        $pdo->exec("UPDATE pengantin SET panggilan = CASE jenis WHEN 'pria' THEN 'Malik' ELSE 'Harsya' END");
     }
     $galeri_sudah_ada = (bool) $pdo->query("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'galeri'")->fetchColumn();
     $pdo->exec("
@@ -144,6 +171,14 @@ function isi_ukuran_gambar(PDO $pdo): void
             if ($w > 0) $u->execute([$w, $h, $b['pk']]);
         }
     }
+}
+
+/** Nama panggilan untuk cover; kalau kosong, pakai kata pertama nama lengkap. */
+function nama_panggilan(array $p): string
+{
+    $n = trim((string) ($p['panggilan'] ?? ''));
+    if ($n !== '') return $n;
+    return trim(explode(' ', trim(explode(',', (string) ($p['nama'] ?? ''))[0]))[0]);
 }
 
 /** @return array{pria: array, wanita: array} */

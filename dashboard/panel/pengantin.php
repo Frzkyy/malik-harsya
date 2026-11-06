@@ -37,6 +37,7 @@ $judul_jenis = ['pria' => 'Pengantin Pria', 'wanita' => 'Pengantin Wanita'];
                     </div>
                     <dl>
                         <dt>Nama</dt>   <dd><?= e($p['nama']) ?: '<span class="kosong">-</span>' ?></dd>
+                        <dt>Panggilan</dt> <dd><?= e(nama_panggilan($p)) ?: '<span class="kosong">-</span>' ?></dd>
                         <dt>Ibu</dt>    <dd><?= e($p['ibu']) ?: '<span class="kosong">-</span>' ?></dd>
                         <dt>Ayah</dt>   <dd><?= e($p['ayah']) ?: '<span class="kosong">-</span>' ?></dd>
                         <dt>Alamat</dt> <dd><?= e($p['alamat']) ?: '<span class="kosong">-</span>' ?></dd>
@@ -56,6 +57,9 @@ $judul_jenis = ['pria' => 'Pengantin Pria', 'wanita' => 'Pengantin Wanita'];
 
                     <label>Nama
                         <input type="text" name="nama" value="<?= e($p['nama']) ?>" maxlength="100" required autofocus>
+                    </label>
+                    <label>Nama panggilan <small>(tampil di cover undangan)</small>
+                        <input type="text" name="panggilan" value="<?= e(nama_panggilan($p)) ?>" maxlength="30" required>
                     </label>
                     <label>Ibu
                         <input type="text" name="ibu" value="<?= e($p['ibu']) ?>" maxlength="100">

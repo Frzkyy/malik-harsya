@@ -1,10 +1,16 @@
 <?php
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/tamu.php';
+
+$tamu_slug = '';
 
 function balik(string $tipe, string $pesan, array $old = []): never
 {
+    global $tamu_slug;
     $_SESSION['flash'] = ['tipe' => $tipe, 'pesan' => $pesan, 'old' => $old];
-    header('Location: ./#rsvp', true, 303);
+    // Pertahankan link tamu supaya nama di cover tidak hilang setelah kirim.
+    $q = $tamu_slug !== '' ? '?tamu=' . rawurlencode($tamu_slug) : '';
+    header('Location: ./' . $q . '#rsvp', true, 303);
     exit;
 }
 
@@ -21,6 +27,9 @@ if (!empty($_POST['website'])) {
 if (!csrf_valid($_POST['csrf'] ?? null)) {
     balik('error', 'Sesi kedaluwarsa. Silakan coba kirim lagi.');
 }
+
+$tamu_slug = strtolower(trim((string) ($_POST['tamu'] ?? '')));
+$tamu_slug = slug_valid($tamu_slug) ? $tamu_slug : '';
 
 $nama   = trim((string) ($_POST['nama'] ?? ''));
 $status = (string) ($_POST['status'] ?? '');
@@ -48,10 +57,11 @@ if ($status === 'tidak') {
 }
 
 try {
+    $tamu = $tamu_slug !== '' ? cari_tamu($tamu_slug) : null;
     $stmt = db()->prepare(
-        'INSERT INTO rsvp (nama, status, jumlah, ucapan) VALUES (?, ?, ?, ?)'
+        'INSERT INTO rsvp (nama, status, jumlah, ucapan, tamu_id) VALUES (?, ?, ?, ?, ?)'
     );
-    $stmt->execute([$nama, $status, $jumlah, $ucapan !== '' ? $ucapan : null]);
+    $stmt->execute([$nama, $status, $jumlah, $ucapan !== '' ? $ucapan : null, $tamu['id'] ?? null]);
 } catch (Throwable $ex) {
     error_log('RSVP gagal disimpan: ' . $ex->getMessage());
     balik('error', 'Maaf, RSVP belum tersimpan. Silakan coba lagi sebentar lagi.', $old);

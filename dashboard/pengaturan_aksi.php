@@ -21,7 +21,26 @@ if (!csrf_valid($_POST['csrf'] ?? null)) {
     balik_pengaturan('error', 'Sesi kedaluwarsa. Silakan coba lagi.');
 }
 
-if (($_POST['aksi'] ?? '') !== 'reset_gambar') {
+$aksi = (string) ($_POST['aksi'] ?? '');
+
+if ($aksi === 'reset_nama') {
+    try {
+        // Nilai bawaan sama dengan isi awal di includes/db.php.
+        db()->exec("UPDATE pengantin SET
+            nama      = CASE jenis WHEN 'pria' THEN 'Malik Pratama, S.T' ELSE 'Harsya Rahma, S.H' END,
+            panggilan = CASE jenis WHEN 'pria' THEN 'Malik' ELSE 'Harsya' END,
+            ibu       = CASE jenis WHEN 'pria' THEN 'Siti Nurhaliza' ELSE 'Dewi Lestari' END,
+            ayah      = CASE jenis WHEN 'pria' THEN 'Hendra Pratama' ELSE 'Ahmad Fauzi' END,
+            alamat    = ''
+        ");
+        balik_pengaturan('ok', 'Nama dan biodata pengantin dikembalikan ke Malik & Harsya.');
+    } catch (Throwable $ex) {
+        error_log('Reset nama gagal: ' . $ex->getMessage());
+        balik_pengaturan('error', 'Reset nama gagal. Periksa log PHP.');
+    }
+}
+
+if ($aksi !== 'reset_gambar') {
     balik_pengaturan('error', 'Aksi tidak dikenal.');
 }
 

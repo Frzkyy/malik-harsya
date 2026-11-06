@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/tamu.php';
 
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
@@ -35,6 +36,15 @@ try {
     $total_hal = 1;
 }
 
+// Link pribadi: /nama-tamu atau ?tamu=nama-tamu. Slug tidak dikenal = tamu umum.
+$tamu = null;
+try {
+    $tamu = cari_tamu((string) ($_GET['tamu'] ?? ''));
+} catch (Throwable $ex) {
+    error_log('Gagal memuat tamu: ' . $ex->getMessage());
+}
+$nama_tamu = $tamu['nama'] ?? 'Tamu Undangan';
+
 $galeri = [];
 try {
     $galeri = db()->query('SELECT file, lebar, tinggi FROM galeri ORDER BY id')->fetchAll();
@@ -64,6 +74,11 @@ function orang_tua(array $p): string
     return implode(' & ', $o);
 }
 
+$nama_pria   = isset($pengantin['pria'])   ? nama_panggilan($pengantin['pria'])   : 'Malik';
+$nama_wanita = isset($pengantin['wanita']) ? nama_panggilan($pengantin['wanita']) : 'Harsya';
+$nama_pria   = $nama_pria   !== '' ? $nama_pria   : 'Malik';
+$nama_wanita = $nama_wanita !== '' ? $nama_wanita : 'Harsya';
+
 $label_status = ['hadir' => 'Hadir', 'ragu' => 'Belum pasti', 'tidak' => 'Tidak hadir'];
 $bulan = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -84,7 +99,7 @@ function tgl_ucapan(string $utc, array $bulan): string
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta property="og:title" content="Undangan Pernikahan Malik & Harsya">
+    <meta property="og:title" content="Undangan Pernikahan <?= e($nama_pria) ?> &amp; <?= e($nama_wanita) ?>">
     <meta property="og:image" content="media/belakang-belakangan-putih.jpeg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -93,7 +108,7 @@ function tgl_ucapan(string $utc, array $bulan): string
 
     <link rel="stylesheet" href="assets/css/style.css">
 
-    <title>Malik & Harsya</title>
+    <title><?= e($nama_pria) ?> &amp; <?= e($nama_wanita) ?></title>
 </head>
 
 <body>
@@ -103,14 +118,14 @@ function tgl_ucapan(string $utc, array $bulan): string
             <p id="wedding-title">The Wedding of</p>
 
             <div id="couple-name">
-                <span>Malik</span>
+                <span><?= e($nama_pria) ?></span>
                 <span>&</span>
-                <span>Harsya</span>
+                <span><?= e($nama_wanita) ?></span>
             </div>
 
             <div id="cover-text">
                 <p id="cover-invitation">Dengan hormat, kami mengundang</p>
-                <p id="cover-name">Walter White</p>
+                <p id="cover-name"><?= e($nama_tamu) ?></p>
             </div>
 
             <p id="cover-date">17 Agustus 1945</p>
@@ -411,6 +426,9 @@ function tgl_ucapan(string $utc, array $bulan): string
             <form id="form-rsvp" action="submit.php" method="post">
 
                 <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                <?php if ($tamu): ?>
+                    <input type="hidden" name="tamu" value="<?= e($tamu['slug']) ?>">
+                <?php endif; ?>
 
                 <div class="jebakan" aria-hidden="true">
                     <label for="rsvp-website">Website</label>
@@ -419,7 +437,7 @@ function tgl_ucapan(string $utc, array $bulan): string
 
                 <div class="field">
                     <label for="rsvp-nama">Nama</label>
-                    <input type="text" id="rsvp-nama" name="nama" maxlength="100" autocomplete="name" value="<?= e($old['nama'] ?? '') ?>" required>
+                    <input type="text" id="rsvp-nama" name="nama" maxlength="100" autocomplete="name" value="<?= e($old['nama'] ?? ($tamu['nama'] ?? '')) ?>" required>
                 </div>
 
                 <fieldset class="field">

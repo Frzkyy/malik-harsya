@@ -36,12 +36,16 @@ if (($_POST['aksi'] ?? '') !== 'simpan' || !in_array($jenis, ['pria', 'wanita'],
 $panjang = static fn (string $s, int $maks): bool => (bool) preg_match('/^.{0,' . $maks . '}$/su', $s);
 
 $nama   = trim((string) ($_POST['nama'] ?? ''));
+$panggilan = trim((string) ($_POST['panggilan'] ?? ''));
 $ibu    = trim((string) ($_POST['ibu'] ?? ''));
 $ayah   = trim((string) ($_POST['ayah'] ?? ''));
 $alamat = trim((string) ($_POST['alamat'] ?? ''));
 
 if ($nama === '' || !$panjang($nama, 100)) {
     balik_pengantin('error', 'Nama wajib diisi (maksimal 100 karakter).', $jenis);
+}
+if ($panggilan === '' || !$panjang($panggilan, 30)) {
+    balik_pengantin('error', 'Nama panggilan wajib diisi (maksimal 30 karakter).', $jenis);
 }
 if (!$panjang($ibu, 100) || !$panjang($ayah, 100)) {
     balik_pengantin('error', 'Nama ibu/ayah maksimal 100 karakter.', $jenis);
@@ -66,12 +70,12 @@ try {
     $lama = (string) $pdo->query('SELECT foto FROM pengantin WHERE jenis = ' . $pdo->quote($jenis))->fetchColumn();
 
     if ($foto_baru) {
-        $pdo->prepare('UPDATE pengantin SET nama = ?, ibu = ?, ayah = ?, alamat = ?, foto = ?, foto_lebar = ?, foto_tinggi = ? WHERE jenis = ?')
-            ->execute([$nama, $ibu, $ayah, $alamat, $foto_baru['file'], $foto_baru['lebar'], $foto_baru['tinggi'], $jenis]);
+        $pdo->prepare('UPDATE pengantin SET nama = ?, panggilan = ?, ibu = ?, ayah = ?, alamat = ?, foto = ?, foto_lebar = ?, foto_tinggi = ? WHERE jenis = ?')
+            ->execute([$nama, $panggilan, $ibu, $ayah, $alamat, $foto_baru['file'], $foto_baru['lebar'], $foto_baru['tinggi'], $jenis]);
         hapus_unggahan($lama);
     } else {
-        $pdo->prepare('UPDATE pengantin SET nama = ?, ibu = ?, ayah = ?, alamat = ? WHERE jenis = ?')
-            ->execute([$nama, $ibu, $ayah, $alamat, $jenis]);
+        $pdo->prepare('UPDATE pengantin SET nama = ?, panggilan = ?, ibu = ?, ayah = ?, alamat = ? WHERE jenis = ?')
+            ->execute([$nama, $panggilan, $ibu, $ayah, $alamat, $jenis]);
     }
 } catch (Throwable $ex) {
     if ($foto_baru) hapus_unggahan($foto_baru['file']);
