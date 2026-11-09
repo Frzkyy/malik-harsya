@@ -53,7 +53,8 @@ try {
                 $g = simpan_gambar($f);
                 $ins->execute([$g['file'], $g['lebar'], $g['tinggi']]);
                 $berhasil++;
-            } catch (RuntimeException $ex) {
+            } catch (Throwable $ex) {
+                error_log('Unggah galeri gagal: ' . $ex->getMessage());
                 $gagal[] = ($f['name'] ?? 'file') . ': ' . $ex->getMessage();
             }
         }
@@ -77,7 +78,8 @@ try {
     }
 } catch (Throwable $ex) {
     error_log('Aksi galeri gagal: ' . $ex->getMessage());
-    balik_galeri('error', 'Terjadi kesalahan. Coba lagi.');
+    // Halaman ini hanya untuk admin, jadi penyebab aslinya boleh ditampilkan supaya mudah dilacak.
+    balik_galeri('error', 'Terjadi kesalahan: ' . $ex->getMessage());
 }
 
 balik_galeri('error', 'Data tidak valid.');

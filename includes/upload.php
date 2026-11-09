@@ -30,8 +30,17 @@ function simpan_gambar(array $f): array
         throw new RuntimeException('Ukuran file terlalu besar (maksimal 12 MB).');
     }
 
+    foreach (['imagecreatetruecolor' => 'GD', 'imagejpeg' => 'GD'] as $fn => $ext) {
+        if (!function_exists($fn)) {
+            throw new RuntimeException("Ekstensi PHP $ext belum aktif di server. Aktifkan php-gd (atau minta hosting mengaktifkannya).");
+        }
+    }
+
     $tmp  = $f['tmp_name'];
-    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($tmp);
+    // fileinfo tidak selalu aktif di hosting; getimagesize() membaca header gambar dan cukup untuk ini.
+    $mime = class_exists('finfo')
+        ? (new finfo(FILEINFO_MIME_TYPE))->file($tmp)
+        : (@getimagesize($tmp)['mime'] ?? '');
     if (!isset(UNGGAH_TIPE[$mime])) {
         throw new RuntimeException('Format tidak didukung. Gunakan JPG, PNG, atau WebP.');
     }
@@ -44,7 +53,7 @@ function simpan_gambar(array $f): array
     $src = match ($mime) {
         'image/jpeg' => @imagecreatefromjpeg($tmp),
         'image/png'  => @imagecreatefrompng($tmp),
-        'image/webp' => @imagecreatefromwebp($tmp),
+        'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($tmp) : false,
     };
     if (!$src) {
         throw new RuntimeException('Gambar rusak atau tidak bisa dibaca.');
@@ -84,7 +93,7 @@ function simpan_gambar(array $f): array
     $ok = match ($ext) {
         'jpg'  => imagejpeg($src, $tuju, 85),
         'png'  => imagepng($src, $tuju, 6),
-        'webp' => imagewebp($src, $tuju, 85),
+        'webp' => function_exists('imagewebp') && imagewebp($src, $tuju, 85),
     };
     if (!$ok) {
         throw new RuntimeException('Gagal menyimpan gambar.');

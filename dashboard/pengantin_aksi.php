@@ -80,7 +80,7 @@ try {
 } catch (Throwable $ex) {
     if ($foto_baru) hapus_unggahan($foto_baru['file']);
     error_log('Simpan pengantin gagal: ' . $ex->getMessage());
-    balik_pengantin('error', 'Terjadi kesalahan. Coba lagi.', $jenis);
+    balik_pengantin('error', 'Terjadi kesalahan: ' . $ex->getMessage(), $jenis);
 }
 
 balik_pengantin('ok', 'Data pengantin ' . $jenis . ' disimpan.');
