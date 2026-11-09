@@ -89,6 +89,14 @@ function db(): PDO
         // Isi awal = teks yang sebelumnya tertulis langsung di cover.
         $pdo->exec("UPDATE pengantin SET panggilan = CASE jenis WHEN 'pria' THEN 'Malik' ELSE 'Harsya' END");
     }
+    // Isi undangan yang bisa diedit dari dashboard (kunci -> nilai). Bawaan: includes/undangan.php.
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS undangan (
+            kunci TEXT PRIMARY KEY,
+            nilai TEXT NOT NULL DEFAULT ''
+        )
+    ");
+
     $galeri_sudah_ada = (bool) $pdo->query("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'galeri'")->fetchColumn();
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS galeri (

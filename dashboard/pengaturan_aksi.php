@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/upload.php';
+require_once __DIR__ . '/../includes/undangan.php';
 
 require_superadmin();
 
@@ -46,6 +47,7 @@ if ($aksi !== 'reset_gambar') {
 
 try {
     $pdo = db();
+    $foto_undangan = array_intersect_key(ambil_undangan(), array_flip(UNDANGAN_KUNCI_FOTO));
     $pdo->beginTransaction();
 
     $foto_pengantin = $pdo->query('SELECT foto FROM pengantin')->fetchAll(PDO::FETCH_COLUMN);
@@ -60,6 +62,9 @@ try {
         foto_tinggi = 0
     ");
 
+    // Foto cover, akad nikah, dan resepsi: hapus nilai tersimpan -> kembali ke bawaan (includes/undangan.php).
+    $pdo->exec("DELETE FROM undangan WHERE kunci IN ('cover_foto', 'akad_foto', 'resepsi_foto')");
+
     $pdo->exec('DELETE FROM galeri');
     $stmt = $pdo->prepare('INSERT INTO galeri (file) VALUES (?)');
     foreach (['media/galeri-2.jpeg', 'media/galeri-1.jpeg', 'media/galeri-3.jpeg'] as $file) {
@@ -68,7 +73,7 @@ try {
 
     $pdo->commit();
 
-    foreach (array_merge($foto_pengantin, $foto_galeri) as $file) {
+    foreach (array_merge($foto_pengantin, $foto_galeri, array_values($foto_undangan)) as $file) {
         hapus_unggahan((string) $file);
     }
 

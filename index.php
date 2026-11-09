@@ -2,6 +2,11 @@
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/tamu.php';
+require_once __DIR__ . '/includes/undangan.php';
+
+// Mode pratinjau: dipakai iframe di dashboard (tab Undangan), hanya untuk admin yang login.
+// Gerbang & sesi tamu dilewati supaya tidak mengubah sesi siapa pun.
+$pratinjau = isset($_GET['pratinjau']) && is_admin();
 
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
@@ -47,7 +52,7 @@ $gerbang_error = (string) ($_SESSION['masuk_error'] ?? '');
 unset($_SESSION['masuk_error']);
 
 try {
-    $slug_link = trim((string) ($_GET['tamu'] ?? ''));
+    $slug_link = $pratinjau ? '' : trim((string) ($_GET['tamu'] ?? ''));
     if ($slug_link !== '') {
         $tamu = cari_tamu($slug_link);
         if ($tamu) {
@@ -56,7 +61,7 @@ try {
         } else {
             $gerbang_error = 'Link undangan tidak dikenali. Silakan masukkan nama Anda.';
         }
-    } elseif (!empty($_SESSION['tamu_id'])) {
+    } elseif (!$pratinjau && !empty($_SESSION['tamu_id'])) {
         $s = db()->prepare('SELECT id, nama, slug FROM tamu WHERE id = ?');
         $s->execute([(int) $_SESSION['tamu_id']]);
         $tamu = $s->fetch() ?: null;
@@ -74,6 +79,7 @@ if (!$tamu && !empty($_SESSION['tamu_guest'])) {
     $guest = true;
     $gerbang = '';
 }
+if ($pratinjau) $gerbang = '';
 $nama_tamu = $tamu['nama'] ?? 'Bapak/Ibu';
 
 $galeri = [];
@@ -104,6 +110,8 @@ function orang_tua(array $p): string
     if ($p['ibu'] !== '')  $o[] = 'Ibu ' . $p['ibu'];
     return implode(' & ', $o);
 }
+
+$und = ambil_undangan();   // teks, tanggal, jam & gambar yang diedit dari dashboard
 
 $nama_pria   = isset($pengantin['pria'])   ? nama_panggilan($pengantin['pria'])   : 'Malik';
 $nama_wanita = isset($pengantin['wanita']) ? nama_panggilan($pengantin['wanita']) : 'Harsya';
@@ -147,7 +155,7 @@ function tgl_ucapan(string $utc, array $bulan): string
     <?php if ($gerbang !== ''): ?>
         <section id="gerbang" aria-label="Masuk undangan">
             <div class="gerbang-isi">
-                <p class="gerbang-judul">The Wedding of</p>
+                <p class="gerbang-judul"><?= e($und['cover_judul']) ?></p>
                 <p class="gerbang-nama"><?= e($nama_pria) ?> <span>&amp;</span> <?= e($nama_wanita) ?></p>
 
                 <p id="gerbang-error" class="pesan-login" role="alert" <?= $gerbang_error === '' ? 'hidden' : '' ?>><?= e($gerbang_error) ?></p>
@@ -178,8 +186,8 @@ function tgl_ucapan(string $utc, array $bulan): string
 
     <main id="bungkus">
 
-        <section id="cover-image">
-            <p id="wedding-title">The Wedding of</p>
+        <section id="cover-image" style="background-image: url('<?= e(url_gambar_aman($und['cover_foto'], UNDANGAN_BAWAAN['cover_foto'])) ?>')">
+            <p id="wedding-title"><?= e($und['cover_judul']) ?></p>
 
             <div id="couple-name">
                 <span><?= e($nama_pria) ?></span>
@@ -193,18 +201,14 @@ function tgl_ucapan(string $utc, array $bulan): string
                 <a class="ganti-tamu" id="ganti-tamu" href="masuk.php?keluar=1"><?= $tamu ? 'Bukan Anda? Ganti' : 'Masuk dengan nama Anda' ?></a>
             </div>
 
-            <p id="cover-date">17 Agustus 1945</p>
+            <p id="cover-date"><?= e(tanggal_indo($und['tanggal'])) ?></p>
         </section>
 
         <section id="ucapan-tujuan">
             <img src="media/ornamen-sudut-1.png" alt="">
             <img src="media/ornamen-lurus-atas-1.png" alt="">
 
-            <p>
-                Dengan segala hormat, kami mengundang Bapak/Ibu/Saudara/i
-                untuk hadir dan memberikan doa restu pada hari pernikahan kami.
-                Mohon konfirmasi kehadiran Anda melalui form RSVP di bawah.
-            </p>
+            <p id="kata-pengantar"><?= nl2br(e($und['kata_pengantar'])) ?></p>
 
             <a class="btn" href="#rsvp">RSVP</a>
 
@@ -214,9 +218,9 @@ function tgl_ucapan(string $utc, array $bulan): string
 
         <section id="informasi-pengundang">
 
-            <h1>Mempelai</h1>
+            <h1 id="mempelai-judul"><?= e($und['mempelai_judul']) ?></h1>
 
-            <h2>Dua insan, satu tujuan</h2>
+            <h2 id="mempelai-deskripsi"><?= e($und['mempelai_deskripsi']) ?></h2>
 
             <img id="ornamen-tengah" src="media/ornamen-lurus-tengah-1.png" alt="">
 
@@ -228,7 +232,7 @@ function tgl_ucapan(string $utc, array $bulan): string
                          style="aspect-ratio: <?= rasio((int) $p['foto_lebar'], (int) $p['foto_tinggi']) ?>"
                          decoding="async">
 
-                    <p>
+                    <p id="teks-mempelai-<?= $jenis ?>">
                         <?= e($p['nama']) ?><br>
                         <?php if (orang_tua($p) !== ''): ?>
                             <?= $label ?><br>
@@ -245,51 +249,43 @@ function tgl_ucapan(string $utc, array $bulan): string
 
             <h1>Tempat & Waktu</h1>
 
-            <h2 class="tanggal-acara">Senin, 17 Agustus 1945</h2>
+            <h2 class="tanggal-acara" id="tanggal-acara"><?= e(tanggal_indo($und['tanggal'], true)) ?></h2>
 
-            <div class="waktu">
+            <div class="waktu" id="acara-akad">
 
                 <div class="waktu-isi">
 
                     <div class="waktu-info">
 
-                        <p class="jam">08:00 - 10:00 WIB</p>
+                        <p class="jam"><?= e(jam_acara($und['akad_mulai'], $und['akad_selesai'], $und['akad_zona'])) ?></p>
 
                         <h2>Akad Nikah</h2>
 
-                        <p>
-                            Di hadapan keluarga tercinta, dua hati terikat
-                            dalam janji suci yang diucapkan dengan khidmat
-                            dan penuh syukur.
-                        </p>
+                        <p><?= nl2br(e($und['akad_deskripsi'])) ?></p>
 
                     </div>
 
-                    <img src="media/footage-1.jpg" alt="Suasana akad nikah">
+                    <img src="<?= e(url_gambar_aman($und['akad_foto'], UNDANGAN_BAWAAN['akad_foto'])) ?>" alt="Suasana akad nikah">
 
                 </div>
 
             </div>
 
-            <div class="waktu">
+            <div class="waktu" id="acara-resepsi">
 
                 <div class="waktu-isi">
 
                     <div class="waktu-info">
 
-                        <p class="jam">15:00 - 20:00 WIB</p>
+                        <p class="jam"><?= e(jam_acara($und['resepsi_mulai'], $und['resepsi_selesai'], $und['resepsi_zona'])) ?></p>
 
                         <h2>Resepsi</h2>
 
-                        <p>
-                            Senja menjadi saksi kebahagiaan yang kami rayakan
-                            bersama keluarga dan sahabat, dalam hangatnya
-                            doa, tawa, dan kebersamaan.
-                        </p>
+                        <p><?= nl2br(e($und['resepsi_deskripsi'])) ?></p>
 
                     </div>
 
-                    <img src="media/footage-2.jpg" alt="Suasana resepsi">
+                    <img src="<?= e(url_gambar_aman($und['resepsi_foto'], UNDANGAN_BAWAAN['resepsi_foto'])) ?>" alt="Suasana resepsi">
 
                 </div>
 
@@ -575,6 +571,10 @@ function tgl_ucapan(string $utc, array $bulan): string
         </section>
 
     </main>
+
+    <?php if ($pratinjau): ?>
+        <script src="assets/js/pratinjau.js"></script>
+    <?php endif; ?>
 
     <script>
     // Gerbang tamu: kirim nama lewat fetch, lalu gerbang naik ke atas membuka undangan.
