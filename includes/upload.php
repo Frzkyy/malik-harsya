@@ -30,12 +30,6 @@ function simpan_gambar(array $f): array
         throw new RuntimeException('Ukuran file terlalu besar (maksimal 12 MB).');
     }
 
-    foreach (['imagecreatetruecolor' => 'GD', 'imagejpeg' => 'GD'] as $fn => $ext) {
-        if (!function_exists($fn)) {
-            throw new RuntimeException("Ekstensi PHP $ext belum aktif di server. Aktifkan php-gd (atau minta hosting mengaktifkannya).");
-        }
-    }
-
     $tmp  = $f['tmp_name'];
     // fileinfo tidak selalu aktif di hosting; getimagesize() membaca header gambar dan cukup untuk ini.
     $mime = class_exists('finfo')
@@ -48,6 +42,12 @@ function simpan_gambar(array $f): array
     $info = @getimagesize($tmp);
     if (!$info || $info[0] < 1 || $info[1] < 1 || $info[0] * $info[1] > 80_000_000) {
         throw new RuntimeException('File bukan gambar yang valid.');
+    }
+
+    // Tanpa GD (sebagian hosting): simpan file asli yang sudah lolos validasi isi gambar.
+    // Konsekuensinya gambar tidak diperkecil dan metadatanya tidak dibuang.
+    if (!function_exists('imagecreatetruecolor') || !function_exists('imagejpeg')) {
+        return simpan_asli($tmp, $mime, (int) $info[0], (int) $info[1]);
     }
 
     $src = match ($mime) {
@@ -132,4 +132,27 @@ function daftar_file(string $key): array
         ];
     }
     return $hasil;
+}
+
+/** Simpan file apa adanya (dipakai kalau ekstensi GD tidak ada). Nama & ekstensi dibuat sendiri dari tipe hasil validasi. */
+function simpan_asli(string $tmp, string $mime, int $w, int $h): array
+{
+    // Foto HP yang "tidur" ditandai lewat EXIF; browser memutarnya sendiri, jadi tukar lebar/tinggi agar rasio benar.
+    if ($mime === 'image/jpeg' && function_exists('exif_read_data')) {
+        $o = (int) (@exif_read_data($tmp)['Orientation'] ?? 1);
+        if ($o >= 5 && $o <= 8) [$w, $h] = [$h, $w];
+    }
+
+    $dir = APP_ROOT . '/' . UNGGAH_DIR;
+    if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+        throw new RuntimeException('Folder unggahan tidak bisa dibuat.');
+    }
+
+    $nama = bin2hex(random_bytes(10)) . '.' . UNGGAH_TIPE[$mime];
+    if (!move_uploaded_file($tmp, $dir . '/' . $nama)) {
+        throw new RuntimeException('Gagal menyimpan gambar. Periksa izin tulis folder ' . UNGGAH_DIR . '/.');
+    }
+    @chmod($dir . '/' . $nama, 0644);
+
+    return ['file' => UNGGAH_DIR . '/' . $nama, 'lebar' => $w, 'tinggi' => $h];
 }
