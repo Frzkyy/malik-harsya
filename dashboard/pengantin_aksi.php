@@ -10,12 +10,12 @@ function balik_pengantin(string $tipe, string $pesan, string $edit = ''): never
 {
     $_SESSION['flash_pengantin'] = ['tipe' => $tipe, 'pesan' => $pesan];
     $q = $edit !== '' ? '&edit=' . $edit : '';
-    header('Location: index.php?panel=pengantin' . $q, true, 303);
+    header('Location: ' . app_url('dashboard/index.php?panel=pengantin' . $q), true, 303);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: index.php?panel=pengantin', true, 303);
+    header('Location: ' . app_url('dashboard/index.php?panel=pengantin'), true, 303);
     exit;
 }
 

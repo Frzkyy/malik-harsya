@@ -7,7 +7,7 @@ require_superadmin();
 function balik_kelola(string $tipe, string $pesan): never
 {
     $_SESSION['flash_kelola'] = ['tipe' => $tipe, 'pesan' => $pesan];
-    header('Location: kelola.php', true, 303);
+    header('Location: ' . app_url('dashboard/kelola.php'), true, 303);
     exit;
 }
 

@@ -8,12 +8,12 @@ require_superadmin();
 function balik_pengaturan(string $tipe, string $pesan): never
 {
     $_SESSION['flash_pengantin'] = ['tipe' => $tipe, 'pesan' => $pesan];
-    header('Location: index.php?panel=pengaturan', true, 303);
+    header('Location: ' . app_url('dashboard/index.php?panel=pengaturan'), true, 303);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: index.php?panel=pengaturan', true, 303);
+    header('Location: ' . app_url('dashboard/index.php?panel=pengaturan'), true, 303);
     exit;
 }
 

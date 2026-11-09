@@ -12,12 +12,12 @@ const GALERI_MAKS_SEKALI = 20; // batas file per sekali unggah
 function balik_galeri(string $tipe, string $pesan): never
 {
     $_SESSION['flash_pengantin'] = ['tipe' => $tipe, 'pesan' => $pesan];
-    header('Location: index.php?panel=pengantin#galeri', true, 303);
+    header('Location: ' . app_url('dashboard/index.php?panel=pengantin#galeri'), true, 303);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: index.php?panel=pengantin#galeri', true, 303);
+    header('Location: ' . app_url('dashboard/index.php?panel=pengantin#galeri'), true, 303);
     exit;
 }
 

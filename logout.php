@@ -8,9 +8,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_valid($_POST['csrf'] ?? null))
         setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
     }
     session_destroy();
-    header('Location: login.php', true, 303);
+    header('Location: ' . app_url('login.php'), true, 303);
     exit;
 }
 
-header('Location: dashboard/', true, 303);
+header('Location: ' . app_url('dashboard/'), true, 303);
 exit;

@@ -4,6 +4,19 @@
 
 define('APP_ROOT', dirname(__DIR__));
 
+/**
+ * Alamat absolut-path ke dalam aplikasi (mis. "/dashboard/"), dihitung dari lokasi project terhadap document root.
+ * Dipakai untuk redirect supaya hasilnya tidak bergantung pada tanda "../" atau "./" relatif
+ * (yang di beberapa konfigurasi server/proxy bisa berubah jadi "//dashboard/").
+ */
+function app_url(string $path = ''): string
+{
+    $dr   = rtrim(str_replace('\\', '/', (string) realpath($_SERVER['DOCUMENT_ROOT'] ?? '')), '/');
+    $root = str_replace('\\', '/', APP_ROOT);
+    $base = ($dr !== '' && str_starts_with($root, $dr . '/')) ? substr($root, strlen($dr)) : '';
+    return rtrim($base, '/') . '/' . ltrim($path, '/');
+}
+
 (function () {
     $file = APP_ROOT . '/.env';
     if (!is_readable($file)) return;
@@ -80,7 +93,7 @@ function require_admin(): void
 {
     if (!is_admin() || !admin_masih_ada()) {
         unset($_SESSION['admin_id'], $_SESSION['admin_user'], $_SESSION['admin_role']);
-        header('Location: ../login.php', true, 303);
+        header('Location: ' . app_url('login.php'), true, 303);
         exit;
     }
 }
@@ -89,7 +102,7 @@ function require_superadmin(): void
 {
     require_admin();
     if (!is_superadmin()) {
-        header('Location: index.php', true, 303);
+        header('Location: ' . app_url('dashboard/'), true, 303);
         exit;
     }
 }

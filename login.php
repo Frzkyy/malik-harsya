@@ -3,7 +3,7 @@ require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/db.php';
 
 if (is_admin()) {
-    header('Location: dashboard/', true, 303);
+    header('Location: ' . app_url('dashboard/'), true, 303);
     exit;
 }
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['admin_user'] = $row['username'];
             $_SESSION['admin_role'] = $row['role'];
             unset($_SESSION['login_gagal'], $_SESSION['login_lock'], $_SESSION['csrf']);
-            header('Location: dashboard/', true, 303);
+            header('Location: ' . app_url('dashboard/'), true, 303);
             exit;
         }
 

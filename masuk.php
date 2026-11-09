@@ -7,7 +7,7 @@ require_once __DIR__ . '/includes/tamu.php';
 
 if (isset($_GET['keluar'])) {
     keluar_tamu();
-    header('Location: ./', true, 303);
+    header('Location: ' . app_url(), true, 303);
     exit;
 }
 
@@ -22,12 +22,12 @@ function selesai_masuk(bool $json, array $data): never
         exit;
     }
     if (empty($data['ok'])) $_SESSION['masuk_error'] = $data['pesan'] ?? 'Gagal masuk.';
-    header('Location: ./', true, 303);
+    header('Location: ' . app_url(), true, 303);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ./', true, 303);
+    header('Location: ' . app_url(), true, 303);
     exit;
 }
 

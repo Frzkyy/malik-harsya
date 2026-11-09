@@ -9,7 +9,7 @@ require_admin();
 function balik_tamu(string $tipe, string $pesan, string $query = ''): never
 {
     $_SESSION['flash_pengantin'] = ['tipe' => $tipe, 'pesan' => $pesan];
-    header('Location: index.php?panel=tamu' . $query, true, 303);
+    header('Location: ' . app_url('dashboard/index.php?panel=tamu' . $query), true, 303);
     exit;
 }
 

@@ -5,12 +5,12 @@ require_once __DIR__ . '/includes/tamu.php';
 function balik(string $tipe, string $pesan, array $old = []): never
 {
     $_SESSION['flash'] = ['tipe' => $tipe, 'pesan' => $pesan, 'old' => $old];
-    header('Location: ./#rsvp', true, 303);
+    header('Location: ' . app_url('#rsvp'), true, 303);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ./#rsvp', true, 303);
+    header('Location: ' . app_url('#rsvp'), true, 303);
     exit;
 }
 
