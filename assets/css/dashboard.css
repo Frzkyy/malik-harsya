@@ -339,22 +339,198 @@ input:focus-visible, textarea:focus-visible, .tombol:focus-visible, button:focus
     .detail-tamu dt { margin-top: 8px; }
 }
 
+
 /* Panel Daftar Hadir */
-.rekap-hadir { margin-bottom: 12px; }
-.rekap-hadir .stat { margin: 0; }
-.rekap-hadir small { color: var(--redup); font-weight: 400; }
+.rekap-hadir {
+    margin-bottom: 16px;
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
 
-.tabel-hadir { background: #f5f8fd; padding: 18px 20px; }
-.tabel-hadir .gulung { overflow-x: auto; }
-.tabel-hadir table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px; }
-.tabel-hadir th, .tabel-hadir td { padding: 10px 12px; border: 2px solid #1d2733; }
-.tabel-hadir th { font-weight: 600; text-align: center; }
-.tabel-hadir td.no, .tabel-hadir th.no { width: 56px; text-align: center; }
-.tabel-hadir td.tengah { text-align: center; }
-.tabel-hadir td .status-tamu { min-width: 140px; }
+.rekap-hadir .stat {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px 40px;
+    margin: 0;
+}
 
-.filter-hadir { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 14px; font-size: 13px; }
-.filter-hadir label { font-weight: 600; }
-.filter-hadir select { padding: 5px 8px; border: 1px solid var(--garis); border-radius: 4px; background: #fff; font: inherit; font-size: 13px; color: var(--teks); }
-.tombol-ungu { padding: 5px 22px; border: 0; border-radius: 4px; background: #5b1fe0; color: #fff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
-.tombol-ungu:hover { background: #4a17bd; }
+.rekap-hadir .stat li {
+    font-size: 15px;
+}
+
+.rekap-hadir .stat strong {
+    font-size: 26px;
+    font-weight: 750;
+    color: #243b53;
+}
+
+.rekap-hadir small {
+    color: #8492a6;
+    font-weight: 400;
+}
+
+/* Tabel */
+.tabel-hadir {
+    padding: 22px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.tabel-hadir .gulung {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 9px;
+}
+
+.tabel-hadir table {
+    width: 100%;
+    min-width: 560px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+}
+
+.tabel-hadir th {
+    padding: 16px 18px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.tabel-hadir th:first-child {
+    border-left: 1px solid #e2e8f0;
+    border-top-left-radius: 8px;
+}
+
+.tabel-hadir th:last-child {
+    border-right: 1px solid #e2e8f0;
+    border-top-right-radius: 8px;
+}
+
+.tabel-hadir td {
+    padding: 15px 18px;
+    color: #475569;
+    border-bottom: 1px solid #e9eef5;
+}
+
+.tabel-hadir td:first-child {
+    border-left: 1px solid #e9eef5;
+}
+
+.tabel-hadir td:last-child {
+    border-right: 1px solid #e9eef5;
+}
+
+.tabel-hadir tbody tr {
+    transition: background 0.2s ease;
+}
+
+.tabel-hadir tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.tabel-hadir tbody tr:hover {
+    background: #eef4ff;
+}
+
+.tabel-hadir tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+.tabel-hadir tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+.tabel-hadir td.no,
+.tabel-hadir th.no {
+    width: 65px;
+    text-align: center;
+}
+
+.tabel-hadir td.tengah {
+    text-align: center;
+}
+
+.tabel-hadir td .status-tamu {
+    display: inline-block;
+    min-width: 140px;
+    padding: 8px 18px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Filter */
+.filter-hadir {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+.filter-hadir label {
+    font-weight: 600;
+    color: #334155;
+}
+
+.filter-hadir select {
+    min-width: 180px;
+    padding: 10px 14px;
+    border: 1px solid #dbe2ea;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    cursor: pointer;
+}
+
+.tombol-ungu {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    background: #6525df;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tombol-ungu:hover {
+    background: #4f19b9;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+    .rekap-hadir {
+        padding: 16px;
+    }
+
+    .rekap-hadir .stat {
+        gap: 12px 20px;
+    }
+
+    .tabel-hadir {
+        padding: 12px;
+    }
+
+    .filter-hadir {
+        justify-content: flex-start;
+    }
+
+    .filter-hadir select {
+        flex: 1;
+        min-width: 120px;
+    }
+}
