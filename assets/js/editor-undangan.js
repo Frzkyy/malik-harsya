@@ -4,6 +4,8 @@
  *  - Pratinjau memakai halaman undangan asli, "layar virtualnya" mengikuti perangkat yang dipakai
  *    (atau HP / Tablet / Desktop pilihan admin) lalu diskalakan agar muat di panel.
  *  - Simpan lewat fetch ke dashboard/undangan_aksi.php (tanpa memuat ulang halaman).
+ *  - Bagian yang rumit (galeri drag: editor-galeri.js, daftar cerita: editor-cerita.js) mendaftar sebagai
+ *    "modul" lewat window.EditorUndangan.daftar({ kumpulkan, isiForm, setelahSimpan }).
  */
 (function () {
     'use strict';
@@ -14,7 +16,7 @@
 
     var ASAL = location.origin;
     var MAKS_BYTE = 12 * 1024 * 1024;           // sama dengan UNGGAH_MAKS di includes/upload.php
-    var NAMA_FOTO = ['cover_foto', 'pria_foto', 'wanita_foto', 'akad_foto', 'resepsi_foto'];
+    var NAMA_FOTO = ['cover_foto', 'pria_foto', 'wanita_foto', 'akad_foto', 'resepsi_foto', 'alamat_foto'];
 
     var layar = document.getElementById('pv-layar');
     var kanvas = document.getElementById('pv-kanvas');
@@ -33,15 +35,27 @@
         if (w) sumberFoto[n] = w.getAttribute('data-path');
     });
 
+    /* ---------- Modul (galeri, cerita) ---------- */
+
+    var modul = [];
+    window.EditorUndangan = {
+        /** m = { kumpulkan(): objek untuk pratinjau, isiForm(FormData), setelahSimpan(balasanServer) } */
+        daftar: function (m) { modul.push(m); jadwalkanKirim(); },
+        berubah: function () { tandaiKotor(); jadwalkanKirim(); },
+        gulir: function (id) { gulirPratinjau(id); },
+        pesan: function (teks, kelas) { setStatus(teks, kelas); }
+    };
+
     /* ---------- Kirim data ke pratinjau ---------- */
 
     function kumpulkan() {
         var d = {};
         Array.prototype.forEach.call(form.elements, function (el) {
-            if (!el.name || el.type === 'file' || el.type === 'hidden') return;
+            if (!el.name || el.type === 'file' || el.type === 'hidden' || el.hasAttribute('data-modul')) return;
             d[el.name] = el.value;
         });
         NAMA_FOTO.forEach(function (n) { d[n] = sumberFoto[n]; });
+        modul.forEach(function (m) { Object.assign(d, m.kumpulkan()); });
         return d;
     }
 
@@ -93,9 +107,11 @@
 
     form.addEventListener('change', function (e) {
         var el = e.target;
+        if (el.hasAttribute('data-modul')) return;   // dikelola modulnya sendiri (cerita)
         if (el.type !== 'file') { if (el.tagName === 'SELECT') { tandaiKotor(); jadwalkanKirim(); } return; }
 
         var wadah = el.closest('.ed-foto');
+        if (!wadah || !wadah.hasAttribute('data-foto')) return;   // file lain (galeri) dikelola modulnya
         var ket = wadah.querySelector('.ed-ket');
         var nama = el.name;
         wadah.classList.remove('ada-galat');
@@ -229,14 +245,26 @@
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-        if (!form.reportValidity()) return;
+
+        // Kolom wajib yang kosong bisa berada di bagian yang sedang tertutup: buka dulu supaya pesannya terlihat.
+        if (!form.checkValidity()) {
+            var salah = form.querySelector(':invalid');
+            var det = salah && salah.closest('details.bagian');
+            if (det) bukaBagian(det);
+            setTimeout(function () { form.reportValidity(); }, 60);
+            setStatus('Ada kolom yang belum diisi dengan benar.', 'galat');
+            return;
+        }
 
         tombolSimpan.disabled = true;
         setStatus('Menyimpan…', '');
 
+        var data = new FormData(form);
+        modul.forEach(function (m) { m.isiForm(data); });
+
         fetch(form.action, {
             method: 'POST',
-            body: new FormData(form),
+            body: data,
             headers: { 'Accept': 'application/json' },
             credentials: 'same-origin'
         })
@@ -256,6 +284,7 @@
                     if (blobAktif[nama]) { URL.revokeObjectURL(blobAktif[nama]); delete blobAktif[nama]; }
                     sumberFoto[nama] = d.gambar[nama];
                 });
+                modul.forEach(function (m) { m.setelahSimpan(d); });
                 kotor = false;
                 var jam = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                 setStatus('Tersimpan pukul ' + jam + '.', 'ok');

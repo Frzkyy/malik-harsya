@@ -5,6 +5,7 @@
 // - Database (tabel `undangan`, kunci -> nilai) hanya menyimpan nilai yang pernah diubah.
 // - Nama panggilan, nama lengkap, orang tua, dan foto mempelai tetap di tabel `pengantin`.
 // - Nama tamu TIDAK dikelola di sini (ada di menu Tamu Undangan + gerbang di index.php).
+// - Foto galeri (tata letak drag) ada di includes/galeri.php, daftar cerita di includes/cerita.php.
 
 const UNDANGAN_BAWAAN = [
     // 1. Cover
@@ -31,21 +32,66 @@ const UNDANGAN_BAWAAN = [
     'resepsi_zona'      => 'WIB',
     'resepsi_deskripsi' => 'Senja menjadi saksi kebahagiaan yang kami rayakan bersama keluarga dan sahabat, dalam hangatnya doa, tawa, dan kebersamaan.',
     'resepsi_foto'      => 'media/footage-2.jpg',
+
+    // 5. Alamat
+    'alamat_judul'     => 'Alamat',
+    'alamat_lokasi'    => 'Hotel Aryaduta Pekanbaru',
+    'alamat_jalan'     => 'Jl. Diponegoro No. 34, Pekanbaru, Riau 28116',
+    'alamat_deskripsi' => 'Di jantung Kota Bertuah, di antara hangatnya doa dan indahnya kebersamaan, kami akan mengikat dua hati dalam satu janji. Hari ini menjadi awal dari langkah panjang yang akan kami tempuh bersama, menyusuri setiap musim kehidupan dengan cinta, kesetiaan, dan rasa syukur.',
+    'alamat_maps'      => 'https://www.google.com/maps/search/?api=1&query=Hotel+Aryaduta+Pekanbaru',   // kosong = dibuat otomatis dari lokasi + jalan
+    'alamat_tombol'    => 'Buka di Maps',
+    'alamat_foto'      => 'media/alamat-arya-duta.png',
+
+    // 6. Galeri (foto & tata letak: includes/galeri.php)
+    'galeri_judul' => 'Galeri',
+
+    // 7. Cerita kami (daftar cerita: includes/cerita.php)
+    'cerita_judul'     => 'Cerita Kami',
+    'cerita_deskripsi' => 'Setiap perjalanan bermula dari satu pertemuan. Inilah kisah singkat kami, dari langkah pertama hingga janji yang kami rajut bersama.',
+
+    // 8. Ucapan
+    'ucapan_judul' => 'Ucapan',
+    'ucapan_teks'  => 'Terima kasih atas setiap doa, ucapan, dan perhatian yang mengalir kepada kami. Bagi kami, kehadiran dan doa restu dari keluarga, sahabat, serta orang-orang terkasih bagaikan cahaya yang menerangi perjalanan menuju hari bahagia ini. Semoga setiap doa baik yang terucap menjadi keberkahan yang menaungi rumah tangga kami, tumbuh bersama kebahagiaan, keharmonisan, dan ketulusan dalam setiap langkah yang kami jalani bersama.',
+
+    // 9. RSVP dan Ucapan & Doa
+    'rsvp_judul'       => 'RSVP',
+    'rsvp_deskripsi'   => 'Mohon konfirmasi kehadiran Anda agar kami dapat mempersiapkan segalanya dengan sebaik mungkin.',
+    'ucapan_doa_judul' => 'Ucapan & Doa',
+    'ucapan_kosong'    => 'Belum ada ucapan. Jadilah yang pertama menyampaikan doa.',
 ];
 
 /** Kunci yang berisi path gambar (di tabel undangan). */
-const UNDANGAN_KUNCI_FOTO = ['cover_foto', 'akad_foto', 'resepsi_foto'];
+const UNDANGAN_KUNCI_FOTO = ['cover_foto', 'akad_foto', 'resepsi_foto', 'alamat_foto'];
 
 const UNDANGAN_ZONA = ['WIB', 'WITA', 'WIT'];
 
-/** Aturan teks: kunci => [wajib, panjang maksimal, label untuk pesan galat]. */
+/** Aturan teks: kunci => [wajib, panjang maksimal, label untuk pesan galat, boleh banyak baris]. */
 const UNDANGAN_ATURAN_TEKS = [
-    'cover_judul'        => [true,  60,  'Judul cover'],
-    'kata_pengantar'     => [false, 800, 'Kata pengantar'],
-    'mempelai_judul'     => [true,  40,  'Judul halaman mempelai'],
-    'mempelai_deskripsi' => [false, 150, 'Deskripsi halaman mempelai'],
-    'akad_deskripsi'     => [false, 400, 'Deskripsi akad nikah'],
-    'resepsi_deskripsi'  => [false, 400, 'Deskripsi resepsi'],
+    'cover_judul'        => [true,  60,  'Judul cover',                false],
+    'kata_pengantar'     => [false, 800, 'Kata pengantar',             true],
+    'mempelai_judul'     => [true,  40,  'Judul halaman mempelai',     false],
+    'mempelai_deskripsi' => [false, 150, 'Deskripsi halaman mempelai', false],
+    'akad_deskripsi'     => [false, 400, 'Deskripsi akad nikah',       true],
+    'resepsi_deskripsi'  => [false, 400, 'Deskripsi resepsi',          true],
+
+    'alamat_judul'       => [true,  40,  'Judul halaman alamat',       false],
+    'alamat_lokasi'      => [true,  100, 'Nama lokasi',                false],
+    'alamat_jalan'       => [false, 200, 'Nama jalan',                 false],
+    'alamat_deskripsi'   => [false, 600, 'Deskripsi alamat',           true],
+    'alamat_tombol'      => [true,  30,  'Teks tombol peta',           false],
+
+    'galeri_judul'       => [true,  40,  'Judul galeri',               false],
+
+    'cerita_judul'       => [true,  40,  'Judul halaman cerita',       false],
+    'cerita_deskripsi'   => [false, 400, 'Deskripsi awal cerita',      true],
+
+    'ucapan_judul'       => [true,  40,  'Judul halaman ucapan',       false],
+    'ucapan_teks'        => [false, 900, 'Teks ucapan',                true],
+
+    'rsvp_judul'         => [true,  40,  'Judul RSVP',                 false],
+    'rsvp_deskripsi'     => [false, 400, 'Deskripsi RSVP',             true],
+    'ucapan_doa_judul'   => [true,  40,  'Judul Ucapan & Doa',        false],
+    'ucapan_kosong'      => [false, 200, 'Teks saat belum ada ucapan', false],
 ];
 
 /** Aturan teks mempelai (tabel pengantin): kolom => [wajib, panjang maksimal, label]. */
@@ -88,6 +134,15 @@ function jam_acara(string $mulai, string $selesai, string $zona): string
     return $selesai !== '' ? "$mulai - $selesai $zona" : "$mulai $zona - Selesai";
 }
 
+/** Link tombol peta: link yang diisi admin, atau pencarian Google Maps dari lokasi + jalan. '' = tombol disembunyikan. */
+function url_maps(array $u): string
+{
+    $link = trim((string) $u['alamat_maps']);
+    if ($link !== '' && preg_match('#^https?://#i', $link)) return $link;
+    $q = trim($u['alamat_lokasi'] . ' ' . $u['alamat_jalan']);
+    return $q === '' ? '' : 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($q);
+}
+
 /** Path gambar yang aman dipakai di atribut style (url(...)); selain itu pakai cadangan. */
 function url_gambar_aman(string $path, string $cadangan): string
 {
@@ -115,12 +170,20 @@ function validasi_undangan(array $in): array
     $panjang = static fn (string $s, int $maks): bool => mb_strlen($s, 'UTF-8') <= $maks;
 
     $u = [];
-    foreach (UNDANGAN_ATURAN_TEKS as $k => [$wajib, $maks, $label]) {
+    foreach (UNDANGAN_ATURAN_TEKS as $k => [$wajib, $maks, $label, $banyak_baris]) {
         $v = $ambil($k);
+        if (!$banyak_baris) $v = trim(str_replace("\n", ' ', $v));   // judul/nama = satu baris
         if ($wajib && $v === '') return [[], [], "$label wajib diisi."];
         if (!$panjang($v, $maks)) return [[], [], "$label maksimal $maks karakter."];
         $u[$k] = $v;
     }
+
+    // Link peta: kosong = otomatis dari lokasi + jalan; kalau diisi harus http(s).
+    $u['alamat_maps'] = $ambil('alamat_maps');
+    if ($u['alamat_maps'] !== '' && (!preg_match('#^https?://#i', $u['alamat_maps']) || !filter_var($u['alamat_maps'], FILTER_VALIDATE_URL))) {
+        return [[], [], 'Link Google Maps harus diawali http:// atau https:// dan berupa alamat web yang valid.'];
+    }
+    if (!$panjang($u['alamat_maps'], 500)) return [[], [], 'Link Google Maps maksimal 500 karakter.'];
 
     $u['tanggal'] = $ambil('tanggal');
     if (!tanggal_valid($u['tanggal'])) return [[], [], 'Tanggal pernikahan tidak valid.'];
@@ -142,11 +205,6 @@ function validasi_undangan(array $in): array
             if (!$panjang($v, $maks)) return [[], [], "$label $nama maksimal $maks karakter."];
             $m[$jenis][$kol] = str_replace("\n", ' ', $v);   // satu baris
         }
-    }
-
-    // Judul/jenis satu baris tidak boleh ada baris baru.
-    foreach (['cover_judul', 'mempelai_judul', 'mempelai_deskripsi'] as $k) {
-        $u[$k] = str_replace("\n", ' ', $u[$k]);
     }
 
     return [$u, $m, null];

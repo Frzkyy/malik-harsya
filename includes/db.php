@@ -108,6 +108,26 @@ function db(): PDO
         )
     ");
     migrasi_galeri($pdo);
+    migrasi_galeri_tata($pdo);
+
+    // Cerita kami (2-8 cerita, urutan bisa diatur dari dashboard). Bawaan: includes/cerita.php.
+    $cerita_sudah_ada = (bool) $pdo->query("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'cerita'")->fetchColumn();
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS cerita (
+            id        INTEGER PRIMARY KEY AUTOINCREMENT,
+            urutan    INTEGER NOT NULL DEFAULT 0,
+            judul     TEXT    NOT NULL,
+            deskripsi TEXT    NOT NULL DEFAULT '',
+            foto      TEXT    NOT NULL DEFAULT ''
+        )
+    ");
+    if (!$cerita_sudah_ada) {
+        require_once __DIR__ . '/cerita.php';
+        $isi = $pdo->prepare('INSERT INTO cerita (urutan, judul, deskripsi, foto) VALUES (?, ?, ?, ?)');
+        foreach (CERITA_BAWAAN as $i => $c) {
+            $isi->execute([$i + 1, $c['judul'], $c['deskripsi'], $c['foto']]);
+        }
+    }
 
     // Isi awal sama dengan teks yang sebelumnya tertulis langsung di index.php.
     $pdo->exec("
@@ -161,6 +181,18 @@ function migrasi_galeri(PDO $pdo): void
         $pdo->exec('INSERT INTO galeri (id, file, created_at) SELECT id, file, created_at FROM galeri_lama ORDER BY id');
         $pdo->exec('DROP TABLE galeri_lama');
         $pdo->commit();
+    }
+}
+
+/**
+ * Tata letak galeri (grid 12 kolom, lihat includes/galeri.php): kolom x, y, w, h.
+ * w = 0 berarti "belum diatur" -> tata letak bawaan (3 foto per baris, ukuran sama).
+ */
+function migrasi_galeri_tata(PDO $pdo): void
+{
+    $kolom = array_column($pdo->query('PRAGMA table_info(galeri)')->fetchAll(), 'name');
+    foreach (['x', 'y', 'w', 'h'] as $k) {
+        if (!in_array($k, $kolom, true)) $pdo->exec("ALTER TABLE galeri ADD COLUMN $k INTEGER NOT NULL DEFAULT 0");
     }
 }
 

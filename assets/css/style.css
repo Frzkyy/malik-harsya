@@ -444,6 +444,11 @@ h1 {
     line-height: 1.5;
 }
 
+#alamat p:empty,
+#alamat .btn[hidden] {
+    display: none;
+}
+
 #alamat p:first-of-type {
     color: var(--hijau);
     font-weight: 600;
@@ -469,40 +474,41 @@ h1 {
 }
 
 /*
- * Galeri fleksibel: baris "justified". Lebar tiap foto mengikuti rasionya (--r = lebar/tinggi),
- * jadi portrait, landscape, dan persegi bisa bercampur dan tiap baris tetap penuh tanpa potong gambar.
+ * Galeri tata letak bebas: kanvas 12 kolom dengan sel persegi (includes/galeri.php).
+ * Tiap foto = kotak (--x, --y, --w, --h) dalam satuan sel. Kanvas memakai aspect-ratio = 12 : jumlah baris
+ * (--baris), jadi semua kotak diposisikan dengan persen dan seluruh tata letak mengecil/membesar
+ * mengikuti lebar layar dengan proporsi tetap. Foto dipotong (cover) mengikuti kotaknya.
  */
 #galeri-list {
-    --baris: 240px;
+    --baris: 3;
+    --jarak: var(--s2);
 
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s2);
+    position: relative;
+
+    aspect-ratio: calc(12 / var(--baris));
 
     list-style: none;
 }
 
+#galeri-list[hidden] {
+    display: none;
+}
+
 #galeri-list li {
-    flex: calc(var(--r) * 100) 1 calc(var(--r) * var(--baris));
-    min-width: 0;
-}
+    position: absolute;
 
-/* Penyangga: baris terakhir tidak ditarik melebar sampai fotonya raksasa. */
-#galeri-list::after {
-    content: "";
-    flex-grow: 1000000;
-}
-
-#galeri-list li:only-child {
-    flex: 1 1 100%;
-    max-width: 720px;
-    margin: 0 auto;
+    left: calc(var(--x) * 100% / 12);
+    top: calc(var(--y) * 100% / var(--baris));
+    width: calc(var(--w) * 100% / 12);
+    height: calc(var(--h) * 100% / var(--baris));
+    padding: calc(var(--jarak) / 2);
 }
 
 .galeri-foto,
 .galeri-foto:hover {
     display: block;
     width: 100%;
+    height: 100%;
     margin: 0;
     padding: 0;
 
@@ -514,7 +520,9 @@ h1 {
 .galeri-foto img {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+
+    object-fit: cover;
 }
 
 .galeri-foto:focus-visible {
@@ -1024,9 +1032,7 @@ h1 {
     }
 
     #galeri-list {
-        --baris: 150px;
-
-        gap: var(--s1);
+        --jarak: var(--s1);
     }
 
     #ucapan-tujuan p {

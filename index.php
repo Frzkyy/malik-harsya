@@ -3,6 +3,8 @@ require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/tamu.php';
 require_once __DIR__ . '/includes/undangan.php';
+require_once __DIR__ . '/includes/galeri.php';
+require_once __DIR__ . '/includes/cerita.php';
 
 // Mode pratinjau: dipakai iframe di dashboard (tab Undangan), hanya untuk admin yang login.
 // Gerbang & sesi tamu dilewati supaya tidak mengubah sesi siapa pun.
@@ -84,10 +86,11 @@ $nama_tamu = $tamu['nama'] ?? 'Bapak/Ibu';
 
 $galeri = [];
 try {
-    $galeri = db()->query('SELECT file, lebar, tinggi FROM galeri ORDER BY id')->fetchAll();
+    $galeri = ambil_galeri();   // foto + posisinya (includes/galeri.php)
 } catch (Throwable $ex) {
     error_log('Gagal memuat galeri: ' . $ex->getMessage());
 }
+$cerita = ambil_cerita();      // includes/cerita.php
 
 try {
     $pengantin = ambil_pengantin();
@@ -295,153 +298,75 @@ function tgl_ucapan(string $utc, array $bulan): string
 
         <section id="lokasi-acara">
 
-            <h1>Alamat</h1>
+            <h1 id="alamat-judul"><?= e($und['alamat_judul']) ?></h1>
 
             <div id="alamat">
 
                 <div>
 
-                    <h2>Hotel Aryaduta Pekanbaru</h2>
+                    <h2 id="alamat-lokasi"><?= e($und['alamat_lokasi']) ?></h2>
 
-                    <p>
-                        Jl. Diponegoro No. 34, Pekanbaru, Riau 28116
-                    </p>
+                    <p id="alamat-jalan"><?= e($und['alamat_jalan']) ?></p>
 
-                    <p>
-                        Di jantung Kota Bertuah, di antara hangatnya doa dan
-                        indahnya kebersamaan, kami akan mengikat dua hati dalam
-                        satu janji. Hari ini menjadi awal dari langkah panjang
-                        yang akan kami tempuh bersama, menyusuri setiap musim
-                        kehidupan dengan cinta, kesetiaan, dan rasa syukur.
-                    </p>
+                    <p id="alamat-deskripsi"><?= nl2br(e($und['alamat_deskripsi'])) ?></p>
 
-                    <a class="btn" href="https://www.google.com/maps/search/?api=1&query=Hotel+Aryaduta+Pekanbaru" target="_blank" rel="noopener">Buka di Maps</a>
+                    <?php $link_maps = url_maps($und); ?>
+                    <a class="btn" id="alamat-maps" href="<?= e($link_maps) ?>" target="_blank" rel="noopener"<?= $link_maps === '' ? ' hidden' : '' ?>><?= e($und['alamat_tombol']) ?></a>
 
                 </div>
 
                 <div>
 
-                    <img src="media/alamat-arya-duta.png" alt="Hotel Aryaduta Pekanbaru">
+                    <img id="alamat-foto" src="<?= e(url_gambar_aman($und['alamat_foto'], UNDANGAN_BAWAAN['alamat_foto'])) ?>" alt="<?= e($und['alamat_lokasi']) ?>">
 
                 </div>
 
             </div>
 
         </section>
-                <section id="galeri">
 
-            <h1>Galeri</h1>
+        <section id="galeri">
 
-            <?php if ($galeri): ?>
-                <ul id="galeri-list">
-                    <?php foreach ($galeri as $i => $g):
-                        $w = (int) $g['lebar']; $h = (int) $g['tinggi'];
-                        $r = $w > 0 && $h > 0 ? round($w / $h, 4) : 1.5;
-                    ?>
-                        <li style="--r: <?= $r ?>">
-                            <button type="button" class="galeri-foto" data-i="<?= $i ?>" aria-label="Perbesar foto <?= $i + 1 ?>">
-                                <img src="<?= e($g['file']) ?>" alt="Galeri foto <?= $i + 1 ?>"
-                                     <?= $w > 0 ? 'width="' . $w . '" height="' . $h . '"' : '' ?>
-                                     loading="lazy" decoding="async">
-                            </button>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
+            <h1 id="galeri-judul"><?= e($und['galeri_judul']) ?></h1>
 
-                <dialog id="galeri-box" aria-label="Foto galeri">
-                    <button type="button" class="gb-tutup" aria-label="Tutup">&times;</button>
-                    <button type="button" class="gb-nav gb-prev" aria-label="Sebelumnya">&lsaquo;</button>
-                    <img id="gb-img" alt="">
-                    <button type="button" class="gb-nav gb-next" aria-label="Berikutnya">&rsaquo;</button>
-                    <p id="gb-hitung"></p>
-                </dialog>
-            <?php endif; ?>
+            <?php /* Tata letak: kanvas 12 kolom, tiap foto = kotak (x, y, w, h). Lihat includes/galeri.php */ ?>
+            <ul id="galeri-list" style="--baris: <?= galeri_jumlah_baris($galeri) ?>"<?= $galeri ? '' : ' hidden' ?>>
+                <?php foreach ($galeri as $i => $g): ?>
+                    <li data-k="g<?= $g['id'] ?>" style="--x: <?= $g['x'] ?>; --y: <?= $g['y'] ?>; --w: <?= $g['w'] ?>; --h: <?= $g['h'] ?>">
+                        <button type="button" class="galeri-foto" data-i="<?= $i ?>" aria-label="Perbesar foto <?= $i + 1 ?>">
+                            <img src="<?= e($g['file']) ?>" alt="Galeri foto <?= $i + 1 ?>" loading="lazy" decoding="async">
+                        </button>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+
+            <dialog id="galeri-box" aria-label="Foto galeri">
+                <button type="button" class="gb-tutup" aria-label="Tutup">&times;</button>
+                <button type="button" class="gb-nav gb-prev" aria-label="Sebelumnya">&lsaquo;</button>
+                <img id="gb-img" alt="">
+                <button type="button" class="gb-nav gb-next" aria-label="Berikutnya">&rsaquo;</button>
+                <p id="gb-hitung"></p>
+            </dialog>
 
         </section>
 
         <section id="story">
 
-            <h1>Cerita Kami</h1>
+            <h1 id="cerita-judul"><?= e($und['cerita_judul']) ?></h1>
 
             <img class="ornamen-story" src="media/ornamen-lurus-tengah-1.png" alt="">
 
-            <h2>
-                Setiap perjalanan bermula dari satu pertemuan. Inilah kisah
-                singkat kami, dari langkah pertama hingga janji yang kami
-                rajut bersama.
-            </h2>
+            <h2 id="cerita-deskripsi"><?= e($und['cerita_deskripsi']) ?></h2>
 
-            <div class="cerita cerita-kiri">
-
-                <div class="cerita-text">
-
-                    <h3>Awal Bertemu (2019)</h3>
-
-                    <p>
-                        Takdir mempertemukan kami di sebuah pertemuan sederhana.
-                        Tak ada yang istimewa hari itu, selain dua senyum yang
-                        diam-diam saling mengingat.
-                    </p>
-
+            <?php foreach ($cerita as $i => $c):
+                $kiri = $i % 2 === 0;   // ganjil: teks di kiri; genap: foto di kiri
+                $teks = '<div class="cerita-text"><h3>' . e($c['judul']) . '</h3><p>' . nl2br(e($c['deskripsi'])) . '</p></div>';
+                $foto = '<img src="' . e(url_gambar_aman($c['foto'], CERITA_FOTO_CADANGAN[$i % count(CERITA_FOTO_CADANGAN)])) . '" alt="' . e($c['judul']) . '">';
+            ?>
+                <div class="cerita <?= $kiri ? 'cerita-kiri' : 'cerita-kanan' ?>" data-k="c<?= $c['id'] ?>">
+                    <?= $kiri ? $teks . $foto : $foto . $teks ?>
                 </div>
-
-                <img src="media/Story-1.png" alt="Awal Bertemu">
-
-            </div>
-
-            <div class="cerita cerita-kanan">
-
-                <img src="media/Story-2.png" alt="Mengenal Lebih Dekat">
-
-                <div class="cerita-text">
-
-                    <h3>Mengenal Lebih Dekat (2021)</h3>
-
-                    <p>
-                        Dari sapa yang singkat, percakapan tumbuh panjang.
-                        Hari demi hari, kami belajar bahwa nyaman bisa lahir
-                        dari hal yang paling biasa.
-                    </p>
-
-                </div>
-
-            </div>
-
-            <div class="cerita cerita-kiri">
-
-                <div class="cerita-text">
-
-                    <h3>Menjalin Komitmen (2024)</h3>
-
-                    <p>
-                        Bersama waktu, rasa itu menemukan arahnya. Kami memilih
-                        untuk saling menggenggam, melangkah dalam suka dan duka
-                        dengan satu tujuan yang sama.
-                    </p>
-
-                </div>
-
-                <img src="media/story-3.png" alt="Menjalin Komitmen">
-
-            </div>
-
-            <div class="cerita cerita-kanan">
-
-                <img src="media/story-4.png" alt="Ikatan Pertunangan">
-
-                <div class="cerita-text">
-
-                    <h3>Ikatan Pertunangan (2026)</h3>
-
-                    <p>
-                        Dengan restu keluarga, sebuah cincin menjadi tanda niat
-                        yang kian mantap. Dari sinilah kami menapaki jalan menuju
-                        hari yang telah lama kami doakan.
-                    </p>
-
-                </div>
-
-            </div>
+            <?php endforeach; ?>
 
         </section>
 
@@ -449,19 +374,11 @@ function tgl_ucapan(string $utc, array $bulan): string
 
             <img class="ornamen-kiri-atas" src="media/ornamen-sudut-1.png" alt="">
 
-            <h1>Ucapan</h1>
+            <h1 id="ucapan-judul"><?= e($und['ucapan_judul']) ?></h1>
 
             <img class="ornamen-tengah" src="media/ornamen-lurus-tengah-1.png" alt="">
 
-            <p>
-                Terima kasih atas setiap doa, ucapan, dan perhatian yang mengalir
-                kepada kami. Bagi kami, kehadiran dan doa restu dari keluarga,
-                sahabat, serta orang-orang terkasih bagaikan cahaya yang
-                menerangi perjalanan menuju hari bahagia ini. Semoga setiap
-                doa baik yang terucap menjadi keberkahan yang menaungi rumah
-                tangga kami, tumbuh bersama kebahagiaan, keharmonisan, dan
-                ketulusan dalam setiap langkah yang kami jalani bersama.
-            </p>
+            <p id="ucapan-teks"><?= nl2br(e($und['ucapan_teks'])) ?></p>
 
             <img class="ornamen-kanan-bawah" src="media/ornamen-sudut-1.png" alt="">
 
@@ -469,14 +386,11 @@ function tgl_ucapan(string $utc, array $bulan): string
 
         <section id="rsvp">
 
-            <h1>RSVP</h1>
+            <h1 id="rsvp-judul"><?= e($und['rsvp_judul']) ?></h1>
 
             <img class="ornamen-rsvp" src="media/ornamen-lurus-tengah-1.png" alt="">
 
-            <p>
-                Mohon konfirmasi kehadiran Anda agar kami dapat
-                mempersiapkan segalanya dengan sebaik mungkin.
-            </p>
+            <p id="rsvp-deskripsi"><?= nl2br(e($und['rsvp_deskripsi'])) ?></p>
 
             <?php if ($flash): ?>
                 <p class="pesan-rsvp pesan-<?= e($flash['tipe']) ?>" role="status">
@@ -484,7 +398,7 @@ function tgl_ucapan(string $utc, array $bulan): string
                 </p>
             <?php endif; ?>
 
-            <form id="form-rsvp"<?= $tamu ? '' : ' hidden' ?> action="submit.php" method="post">
+            <form id="form-rsvp"<?= ($tamu || $pratinjau) ? '' : ' hidden' ?> action="submit.php" method="post">
 
                 <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
 
@@ -522,17 +436,17 @@ function tgl_ucapan(string $utc, array $bulan): string
 
             </form>
 
-            <div class="rsvp-terkunci" id="rsvp-terkunci"<?= $tamu ? ' hidden' : '' ?>>
+            <div class="rsvp-terkunci" id="rsvp-terkunci"<?= ($tamu || $pratinjau) ? ' hidden' : '' ?>>
                     <p>RSVP hanya bisa diisi oleh tamu yang diundang. Silakan masuk dengan nama Anda.</p>
                     <a class="btn" href="masuk.php?keluar=1" id="rsvp-masuk">Masuk</a>
                 </div>
 
             <div id="daftar-ucapan">
 
-                <h2>Ucapan &amp; Doa<?= $total_ucapan ? ' (' . $total_ucapan . ')' : '' ?></h2>
+                <h2><span id="ucapan-doa-judul"><?= e($und['ucapan_doa_judul']) ?></span><?= $total_ucapan ? ' (' . $total_ucapan . ')' : '' ?></h2>
 
                 <?php if (!$daftar_ucapan): ?>
-                    <p class="ucapan-kosong">Belum ada ucapan. Jadilah yang pertama menyampaikan doa.</p>
+                    <p class="ucapan-kosong" id="ucapan-kosong"><?= e($und['ucapan_kosong']) ?></p>
                 <?php else: ?>
                     <ul class="ucapan-list">
                         <?php foreach ($daftar_ucapan as $u): ?>
