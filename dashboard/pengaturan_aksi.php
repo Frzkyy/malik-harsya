@@ -39,6 +39,23 @@ if ($aksi === 'reset_nama') {
         balik_pengaturan('error', 'Reset nama gagal. Periksa log PHP.');
     }
 }
+if ($aksi === 'musik_unggah' || $aksi === 'musik_hapus') {
+    $tujuan = __DIR__ . '/../media/musik/lagu.mp3';
+    if (!is_dir(dirname($tujuan))) mkdir(dirname($tujuan), 0755, true);
+
+    if ($aksi === 'musik_hapus') {
+        if (is_file($tujuan)) unlink($tujuan);
+        balik_pengaturan('ok', 'Musik dihapus.');
+    }
+
+    $f = $_FILES['musik'] ?? null;
+    if (!$f || $f['error'] !== UPLOAD_ERR_OK) balik_pengaturan('error', 'Pilih file MP3 terlebih dahulu.');
+    if ($f['size'] > 15 * 1024 * 1024) balik_pengaturan('error', 'Ukuran musik maksimal 15 MB.');
+    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($f['tmp_name']);
+    if (!in_array($mime, ['audio/mpeg', 'audio/mp3'], true)) balik_pengaturan('error', 'File harus berformat MP3.');
+    if (!move_uploaded_file($f['tmp_name'], $tujuan)) balik_pengaturan('error', 'Gagal menyimpan musik.');
+    balik_pengaturan('ok', 'Musik berhasil disimpan.');
+}
 
 if ($aksi !== 'reset_gambar') {
     balik_pengaturan('error', 'Aksi tidak dikenal.');
@@ -78,3 +95,4 @@ try {
     error_log('Reset gambar gagal: ' . $ex->getMessage());
     balik_pengaturan('error', 'Reset gambar gagal. Periksa log PHP.');
 }
+

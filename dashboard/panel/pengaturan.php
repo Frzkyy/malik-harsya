@@ -38,3 +38,9 @@
         <p class="kosong">Hanya superadmin yang bisa mereset nama pengantin.</p>
     <?php endif; ?>
 </section>
+
+<section class="kartu pengaturan-reset">
+    <h2>Musik latar</h2>
+    <p>Musik latar tersedia untuk menemani halaman undangan dan login. Tekan tombol Putar di pojok kanan bawah untuk menikmati musik, atau tekan Jeda untuk menghentikannya.</p>
+    <audio controls preload="metadata" src="../media/musik/lagu-web.mp3" style="width:100%"></audio>
+</section>
