@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/tamu.php';   // waktu_wib()
 
 require_superadmin();
 
@@ -82,71 +83,112 @@ $daftar = db()->query(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
 
-    <title>Kelola Admin</title>
+    <title>Kelola Admin · Dashboard</title>
 </head>
 
-<body>
-    <main id="login" class="lebar">
+<body class="dash">
 
+    <aside class="sisi">
+        <nav aria-label="Menu dashboard">
+            <a href="index.php?panel=pengantin">Undangan</a>
+            <a href="index.php?panel=tamu">Tamu Undangan</a>
+            <a href="index.php?panel=hadir">Daftar Hadir</a>
+            <a href="index.php?panel=pengaturan" class="aktif" aria-current="page">Pengaturan</a>
+            <a class="kembali" href="../">&larr; Kembali ke undangan</a>
+        </nav>
+
+        <div class="akun">
+            <span><?= e($_SESSION['admin_user']) ?> <em class="role">superadmin</em></span>
+            <form action="../logout.php" method="post">
+                <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                <button type="submit" class="tombol-teks">Keluar</button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="isi">
+
+        <a class="kelola-kembali" href="index.php?panel=pengaturan">&larr; Kembali ke Pengaturan</a>
         <h1>Kelola Admin</h1>
 
-        <p class="login-sub"><a href="index.php?panel=pengaturan">&larr; Kembali</a></p>
-
         <?php if ($flash): ?>
-            <p class="pesan-login <?= $flash['tipe'] === 'ok' ? 'pesan-sukses' : '' ?>" role="status"><?= e($flash['pesan']) ?></p>
+            <p class="pesan <?= $flash['tipe'] === 'ok' ? 'ok' : 'galat' ?>" role="status"><?= e($flash['pesan']) ?></p>
         <?php endif; ?>
 
-        <ul class="daftar-admin">
-            <?php foreach ($daftar as $a): ?>
-                <li class="admin-baris">
-                    <div class="admin-info">
-                        <strong><?= e($a['username']) ?></strong>
-                        <span class="badge-role"><?= e($a['role']) ?></span>
-                    </div>
+        <div class="kelola-grid">
 
-                    <form action="kelola.php" method="post" class="admin-aksi">
-                        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
-                        <input type="hidden" name="aksi" value="reset">
-                        <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
-                        <input type="password" name="password" placeholder="Password baru" autocomplete="new-password" minlength="8" required>
-                        <button type="submit">Ganti</button>
-                    </form>
+            <section class="kartu kelola-daftar" aria-labelledby="h-daftar">
+                <div class="kepala">
+                    <h2 id="h-daftar">Daftar admin</h2>
+                    <span class="kelola-jumlah"><?= count($daftar) ?> akun</span>
+                </div>
 
-                    <?php if ($a['role'] === 'admin'): ?>
-                        <form action="kelola.php" method="post" class="admin-aksi" onsubmit="return confirm('Hapus admin <?= e($a['username']) ?>?');">
-                            <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
-                            <input type="hidden" name="aksi" value="hapus">
-                            <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
-                            <button type="submit" class="btn-bahaya">Hapus</button>
-                        </form>
-                    <?php endif; ?>
-                </li>
-            <?php endforeach; ?>
-        </ul>
+                <ul class="kelola-list">
+                    <?php foreach ($daftar as $a):
+                        $super = $a['role'] === 'superadmin';
+                        $saya  = (int) $a['id'] === (int) ($_SESSION['admin_id'] ?? 0);
+                    ?>
+                        <li class="kelola-baris">
+                            <div class="kelola-atas">
+                                <span class="kelola-avatar<?= $super ? ' super' : '' ?>" aria-hidden="true"><?= e(strtoupper(substr($a['username'], 0, 1))) ?></span>
+                                <div class="kelola-nama">
+                                    <strong><?= e($a['username']) ?><?= $saya ? ' <small>(Anda)</small>' : '' ?></strong>
+                                    <span>Dibuat <?= e(waktu_wib($a['created_at'])) ?></span>
+                                </div>
+                                <span class="kelola-role<?= $super ? ' super' : '' ?>"><?= e($a['role']) ?></span>
+                            </div>
 
-        <h2>Tambah admin</h2>
+                            <div class="kelola-aksi">
+                                <details class="kelola-ganti">
+                                    <summary>Ganti password</summary>
+                                    <form action="kelola.php" method="post">
+                                        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                                        <input type="hidden" name="aksi" value="reset">
+                                        <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
+                                        <input type="password" name="password" placeholder="Password baru (min. 8 karakter)" autocomplete="new-password" minlength="8" required aria-label="Password baru untuk <?= e($a['username']) ?>">
+                                        <button type="submit" class="tombol utama">Simpan</button>
+                                    </form>
+                                </details>
 
-        <form action="kelola.php" method="post">
-            <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
-            <input type="hidden" name="aksi" value="tambah">
+                                <?php if (!$super): ?>
+                                    <form action="kelola.php" method="post" onsubmit="return confirm('Hapus admin <?= e($a['username']) ?>?');">
+                                        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                                        <input type="hidden" name="aksi" value="hapus">
+                                        <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
+                                        <button type="submit" class="kelola-hapus">Hapus</button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </section>
 
-            <div class="field">
-                <label for="baru-username">Username</label>
-                <input type="text" id="baru-username" name="username" autocapitalize="none" maxlength="30" required>
-            </div>
+            <section class="kartu kelola-tambah" aria-labelledby="h-tambah">
+                <h2 id="h-tambah">Tambah admin</h2>
+                <p class="kelola-bantu">Admin baru bisa mengelola undangan dan tamu, tapi tidak bisa mengatur akun admin.</p>
 
-            <div class="field">
-                <label for="baru-password">Password (min. 8 karakter)</label>
-                <input type="password" id="baru-password" name="password" autocomplete="new-password" minlength="8" required>
-            </div>
+                <form action="kelola.php" method="post">
+                    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                    <input type="hidden" name="aksi" value="tambah">
 
-            <button type="submit">Tambah</button>
-        </form>
+                    <label for="baru-username">Username
+                        <small>3-30 karakter: huruf kecil, angka, underscore</small>
+                    </label>
+                    <input type="text" id="baru-username" name="username" autocapitalize="none" maxlength="30" pattern="[a-z0-9_]{3,30}" required>
+
+                    <label for="baru-password">Password
+                        <small>minimal 8 karakter</small>
+                    </label>
+                    <input type="password" id="baru-password" name="password" autocomplete="new-password" minlength="8" required>
+
+                    <button type="submit" class="tombol utama kelola-submit">Tambah admin</button>
+                </form>
+            </section>
+
+        </div>
 
     </main>
 </body>
