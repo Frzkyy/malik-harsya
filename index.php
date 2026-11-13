@@ -522,6 +522,11 @@ function tgl_ucapan(string $utc, array $bulan): string
             if (k) k.hidden = d.mode === 'tamu';
             var n = document.getElementById('rsvp-nama');
             if (n && d.mode === 'tamu' && !n.value) n.value = d.nama;
+
+            // Ubah alamat di browser jadi link pribadi (/nama-tamu) tanpa memuat ulang halaman.
+            if (d.mode === 'tamu' && d.slug && window.history && history.replaceState) {
+                try { history.replaceState(null, '', <?= json_encode(app_url()) ?> + encodeURIComponent(d.slug)); } catch (_) {}
+            }
         }
 
         function kirim(el) {
