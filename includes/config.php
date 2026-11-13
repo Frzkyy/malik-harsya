@@ -4,6 +4,14 @@
 
 define('APP_ROOT', dirname(__DIR__));
 
+// Hosting tanpa ekstensi mbstring: sediakan mb_strlen() pengganti (hitung karakter UTF-8).
+if (!function_exists('mb_strlen')) {
+    function mb_strlen(string $s, ?string $encoding = null): int
+    {
+        return preg_match_all('/./su', $s) ?: strlen(preg_replace('/[\x80-\xBF]/', '', $s));
+    }
+}
+
 /**
  * Alamat absolut-path ke dalam aplikasi (mis. "/dashboard/"), dihitung dari lokasi project terhadap document root.
  * Dipakai untuk redirect supaya hasilnya tidak bergantung pada tanda "../" atau "./" relatif
