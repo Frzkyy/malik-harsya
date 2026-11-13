@@ -42,6 +42,62 @@ if ($aksi === 'reset_nama') {
     }
 }
 
+if ($aksi === 'reset_semua') {
+    // Kembalikan seluruh isi landing page ke bawaan: teks, tanggal, jam, alamat, ucapan, nama & biodata pengantin,
+    // cerita, galeri, dan semua foto. RSVP, daftar tamu, dan akun admin TIDAK disentuh.
+    try {
+        $pdo = db();
+        $foto_undangan = array_intersect_key(ambil_undangan(), array_flip(UNDANGAN_KUNCI_FOTO));
+        $pdo->beginTransaction();
+
+        $foto_lama = array_merge(
+            $pdo->query('SELECT foto FROM pengantin')->fetchAll(PDO::FETCH_COLUMN),
+            $pdo->query('SELECT file FROM galeri')->fetchAll(PDO::FETCH_COLUMN),
+            $pdo->query('SELECT foto FROM cerita')->fetchAll(PDO::FETCH_COLUMN),
+            array_values($foto_undangan)
+        );
+
+        // Semua teks, tanggal, jam, alamat, dan foto undangan: hapus nilai tersimpan -> kembali ke bawaan.
+        $pdo->exec('DELETE FROM undangan');
+
+        // Pengantin: nama, biodata, foto (nilai bawaan sama dengan isi awal di includes/db.php).
+        $pdo->exec("UPDATE pengantin SET
+            nama      = CASE jenis WHEN 'pria' THEN 'Malik Pratama, S.T' ELSE 'Harsya Rahma, S.H' END,
+            panggilan = CASE jenis WHEN 'pria' THEN 'Malik' ELSE 'Harsya' END,
+            ibu       = CASE jenis WHEN 'pria' THEN 'Siti Nurhaliza' ELSE 'Dewi Lestari' END,
+            ayah      = CASE jenis WHEN 'pria' THEN 'Hendra Pratama' ELSE 'Ahmad Fauzi' END,
+            alamat    = '',
+            foto      = CASE jenis WHEN 'pria' THEN 'media/perkenalan-mempelai-pria.jpeg' ELSE 'media/perkenalan-mempelai-wanita.jpeg' END,
+            foto_lebar = 0,
+            foto_tinggi = 0
+        ");
+
+        // Cerita: kembali ke cerita bawaan.
+        $pdo->exec('DELETE FROM cerita');
+        $tambah_c = $pdo->prepare('INSERT INTO cerita (urutan, judul, deskripsi, foto) VALUES (?, ?, ?, ?)');
+        foreach (CERITA_BAWAAN as $i => $c) {
+            $tambah_c->execute([$i + 1, $c['judul'], $c['deskripsi'], $c['foto']]);
+        }
+
+        // Galeri: foto bawaan dengan tata letak bawaan.
+        $pdo->exec('DELETE FROM galeri');
+        $tambah_g = $pdo->prepare('INSERT INTO galeri (file) VALUES (?)');
+        foreach (['media/galeri-2.jpeg', 'media/galeri-1.jpeg', 'media/galeri-3.jpeg'] as $file) {
+            $tambah_g->execute([$file]);
+        }
+
+        $pdo->commit();
+
+        foreach ($foto_lama as $file) hapus_unggahan((string) $file);
+
+        balik_pengaturan('ok', 'Semua isi landing page dikembalikan ke bawaan. Data RSVP, tamu, dan akun admin tidak berubah.');
+    } catch (Throwable $ex) {
+        if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
+        error_log('Reset semua gagal: ' . $ex->getMessage());
+        balik_pengaturan('error', 'Reset semua gagal: ' . $ex->getMessage());
+    }
+}
+
 if ($aksi !== 'reset_gambar') {
     balik_pengaturan('error', 'Aksi tidak dikenal.');
 }
