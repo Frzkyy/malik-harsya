@@ -83,7 +83,8 @@ $daftar = db()->query(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
 
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css?v=<?= (int) @filemtime(__DIR__ . '/../assets/css/dashboard.css') ?>">
+    <link rel="stylesheet" href="../assets/css/kelola.css?v=<?= (int) @filemtime(__DIR__ . '/../assets/css/kelola.css') ?>">
 
     <title>Kelola Admin · Dashboard</title>
 </head>
