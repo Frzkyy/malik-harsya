@@ -667,13 +667,14 @@ h1 {
     flex: 1 1 61.8%;
 
     min-width: 0;
-    aspect-ratio: 1.618 / 1;
+    height: auto;
+    max-height: 85vh;   /* foto potret yang sangat tinggi tetap muat di layar */
 
     padding: var(--s2);
 
     border: 1px solid var(--marun);
 
-    object-fit: cover;
+    object-fit: contain;   /* tampilkan seluruh foto, tidak dipotong */
 }
 
 .cerita-kanan {
