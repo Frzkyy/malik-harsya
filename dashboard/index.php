@@ -6,7 +6,7 @@ require_once __DIR__ . '/../includes/db.php';
 require_admin();
 
 $panel_list = [
-    'pengantin'  => 'Pengantin',
+    'pengantin'  => 'Undangan',
     'tamu'       => 'Tamu Undangan',
     'hadir'      => 'Daftar Hadir',
     'pengaturan' => 'Pengaturan',
@@ -25,6 +25,9 @@ unset($_SESSION['flash_pengantin']);
     <meta name="robots" content="noindex, nofollow">
 
     <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <?php if ($panel === 'pengantin'): ?>
+        <link rel="stylesheet" href="../assets/css/editor-undangan.css">
+    <?php endif; ?>
 
     <title><?= e($panel_list[$panel]) ?> · Dashboard</title>
 </head>
