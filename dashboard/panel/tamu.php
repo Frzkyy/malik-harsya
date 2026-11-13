@@ -62,9 +62,6 @@ try {
             <label>Nama tamu
                 <input type="text" name="nama" maxlength="100" required autofocus placeholder="mis. Said Fairuz Zacky">
             </label>
-            <label>Link <small>(opsional &mdash; kosongkan agar dibuat otomatis dari nama)</small>
-                <input type="text" name="slug" maxlength="60" pattern="[a-z0-9][a-z0-9\-]*" placeholder="mis. said-fairuz">
-            </label>
             <div class="aksi">
                 <button type="submit" class="tombol-biru">Simpan</button>
                 <a class="tombol" href="index.php?panel=tamu">Batal</a>
@@ -82,9 +79,6 @@ try {
             <input type="hidden" name="id" value="<?= (int) $aktif['id'] ?>">
             <label>Nama tamu
                 <input type="text" name="nama" value="<?= e($aktif['nama']) ?>" maxlength="100" required autofocus>
-            </label>
-            <label>Link <small>(kalau diubah, link lama berhenti berlaku)</small>
-                <input type="text" name="slug" value="<?= e($aktif['slug']) ?>" maxlength="60" pattern="[a-z0-9][a-z0-9\-]*">
             </label>
             <div class="aksi">
                 <button type="submit" class="tombol-biru">Simpan</button>
@@ -105,7 +99,6 @@ try {
                     <input type="text" readonly value="<?= e($basis . '/tamu?id=' . (int) $aktif['id']) ?>" aria-label="Link undangan" onfocus="this.select()">
                     <button type="button" class="tombol salin">Salin</button>
                 </span>
-                <small>Atau: <code><?= e($basis . '/' . $aktif['slug']) ?></code></small>
             </dd>
             <dt>Status</dt>
             <dd><?= badge_status($aktif['status']) ?></dd>
