@@ -55,4 +55,4 @@ if (!$tamu) {
 }
 
 masuk_sebagai_tamu($tamu);
-selesai_masuk($json, ['ok' => true, 'mode' => 'tamu', 'nama' => $tamu['nama'], 'slug' => $tamu['slug']]);
+selesai_masuk($json, ['ok' => true, 'mode' => 'tamu', 'nama' => $tamu['nama'], 'slug' => $tamu['slug'], 'id' => (int) $tamu['id']]);

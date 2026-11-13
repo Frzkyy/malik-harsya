@@ -4,7 +4,7 @@
 /** Slug yang tidak boleh dipakai karena bentrok dengan folder/file/rute yang sudah ada. */
 const SLUG_DILARANG = [
     'login', 'logout', 'admin', 'dashboard', 'index', 'submit', 'media', 'assets',
-    'includes', 'data', 'aktivitas', 'env', 'router', 'masuk',
+    'includes', 'data', 'aktivitas', 'env', 'router', 'masuk', 'tamu',
 ];
 
 /** "Said Fairuz Zacky" -> "said-fairuz-zacky" */

@@ -29,6 +29,11 @@ if ($path === '/' || is_file($file) || is_dir($file)) {
     return false; // biarkan server bawaan melayani file / folder yang ada
 }
 
+if ($path === '/tamu' || $path === '/tamu/') {
+    require __DIR__ . '/index.php';
+    return true;
+}
+
 if (preg_match('#^/([a-z0-9][a-z0-9-]*)/?$#', $path, $m)) {
     $_GET['tamu'] = $m[1];
     require __DIR__ . '/index.php';

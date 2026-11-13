@@ -102,10 +102,10 @@ try {
             <dt>Link undangan</dt>
             <dd>
                 <span class="link-salin">
-                    <input type="text" readonly value="<?= e($basis . '/' . $aktif['slug']) ?>" aria-label="Link undangan" onfocus="this.select()">
+                    <input type="text" readonly value="<?= e($basis . '/tamu?id=' . (int) $aktif['id']) ?>" aria-label="Link undangan" onfocus="this.select()">
                     <button type="button" class="tombol salin">Salin</button>
                 </span>
-                <small>Atau: <code><?= e($basis . '/?tamu=' . $aktif['slug']) ?></code></small>
+                <small>Atau: <code><?= e($basis . '/' . $aktif['slug']) ?></code></small>
             </dd>
             <dt>Status</dt>
             <dd><?= badge_status($aktif['status']) ?></dd>

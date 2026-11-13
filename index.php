@@ -55,8 +55,15 @@ unset($_SESSION['masuk_error']);
 
 try {
     $slug_link = $pratinjau ? '' : trim((string) ($_GET['tamu'] ?? ''));
-    if ($slug_link !== '') {
-        $tamu = cari_tamu($slug_link);
+    $id_link   = $pratinjau ? 0 : (ctype_digit((string) ($_GET['id'] ?? '')) ? (int) $_GET['id'] : 0);
+    if ($slug_link !== '' || $id_link > 0) {
+        if ($id_link > 0) {
+            $s = db()->prepare('SELECT id, nama, slug FROM tamu WHERE id = ?');
+            $s->execute([$id_link]);
+            $tamu = $s->fetch() ?: null;
+        } else {
+            $tamu = cari_tamu($slug_link);
+        }
         if ($tamu) {
             masuk_sebagai_tamu($tamu);
             $gerbang = 'sambut';
@@ -523,9 +530,9 @@ function tgl_ucapan(string $utc, array $bulan): string
             var n = document.getElementById('rsvp-nama');
             if (n && d.mode === 'tamu' && !n.value) n.value = d.nama;
 
-            // Ubah alamat di browser jadi link pribadi (/nama-tamu) tanpa memuat ulang halaman.
-            if (d.mode === 'tamu' && d.slug && window.history && history.replaceState) {
-                try { history.replaceState(null, '', <?= json_encode(app_url()) ?> + encodeURIComponent(d.slug)); } catch (_) {}
+            // Ubah alamat di browser jadi link pribadi (/tamu?id=1) tanpa memuat ulang halaman.
+            if (d.mode === 'tamu' && d.id && window.history && history.replaceState) {
+                try { history.replaceState(null, '', <?= json_encode(app_url('tamu')) ?> + '?id=' + encodeURIComponent(d.id)); } catch (_) {}
             }
         }
 
