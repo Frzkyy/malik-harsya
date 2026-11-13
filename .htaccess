@@ -6,3 +6,8 @@ RewriteRule ^admin/?$ admin.php [L]
 
 # Jangan biarkan database bisa diunduh lewat browser
 RewriteRule ^data/ - [F]
+
+# Link pribadi tamu: /nama-tamu -> index.php?tamu=nama-tamu (file & folder asli, mis. /dashboard, tidak terpengaruh)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-z0-9][a-z0-9-]*)/?$ index.php?tamu=$1 [L,QSA]
