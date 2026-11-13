@@ -1,0 +1,222 @@
+/* Halaman login admin (hanya dipakai login.php).
+   Mengikuti undangan: foto pasangan + Great Vibes di kiri, panel kapur dengan ornamen & form bergaya RSVP di kanan. */
+
+body.halaman-login {
+    background: var(--kapur);
+}
+
+.login-bagi {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* ---------- Kiri: foto ---------- */
+
+.login-foto {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--s5) clamp(24px, 5vw, 72px);
+
+    background: url("../../media/belakang-belakangan-putih.jpeg") 38% center / cover;
+    color: var(--kapur);
+}
+
+.login-foto::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(27, 42, 65, .92) 0%, rgba(27, 42, 65, .45) 45%, rgba(27, 42, 65, .1) 100%);
+}
+
+.login-foto > * {
+    position: relative;
+}
+
+.login-foto .judul {
+    font-size: var(--f1);
+    letter-spacing: .12em;
+}
+
+.login-foto .nama {
+    margin: 0 0 var(--s1);
+    font-family: "Great Vibes", cursive;
+    font-size: clamp(2.8rem, 4.6vw, 4.6rem);
+    line-height: 1.1;
+}
+
+.login-foto .nama span {
+    color: var(--kuning);
+}
+
+.login-foto .tanggal {
+    padding-top: var(--s2);
+    border-top: 1px solid var(--kuning);
+    color: var(--kuning);
+    font-size: var(--f1);
+    letter-spacing: .08em;
+    display: inline-block;
+}
+
+/* ---------- Kanan: form ---------- */
+
+body.halaman-login #login {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: var(--s6) clamp(var(--s3), 8vw, 7rem);
+    text-align: left;
+    overflow: hidden;
+}
+
+body.halaman-login #login .login-isi {
+    width: 100%;
+    max-width: 26rem;
+    margin: 0 auto;
+}
+
+/* Ornamen sudut dari media undangan */
+body.halaman-login #login::before,
+body.halaman-login #login::after {
+    content: "";
+    position: absolute;
+    width: clamp(90px, 12vw, 150px);
+    aspect-ratio: 1;
+    background: url("../../media/ornamen-sudut-1.png") center / contain no-repeat;
+    opacity: .45;
+    pointer-events: none;
+}
+
+body.halaman-login #login::before { top: var(--s3); left: var(--s3); }
+body.halaman-login #login::after  { bottom: var(--s3); right: var(--s3); transform: rotate(180deg); }
+
+body.halaman-login #login .kembali-undangan {
+    display: block;
+    width: auto;
+    margin-bottom: var(--s4);
+    color: var(--marun);
+    font-size: var(--f0);
+    text-decoration: none;
+}
+
+body.halaman-login #login .kembali-undangan:hover,
+body.halaman-login #login .kembali-undangan:focus-visible {
+    color: var(--hijau);
+    text-decoration: underline;
+}
+
+body.halaman-login #login h1 {
+    color: var(--hijau);
+    font-size: var(--f3);
+    font-weight: 500;
+    line-height: 1.1;
+}
+
+.login-garis {
+    display: block;
+    width: 64px;
+    height: 1px;
+    margin: var(--s2) 0;
+    background: var(--kuning);
+}
+
+body.halaman-login #login .login-sub {
+    margin: 0 0 var(--s4);
+    color: var(--marun);
+    font-size: var(--f1);
+}
+
+body.halaman-login #login .field {
+    margin-bottom: var(--s3);
+}
+
+body.halaman-login #login label {
+    margin-bottom: var(--s1);
+    color: var(--hijau);
+    font-size: var(--f0);
+    font-weight: 600;
+}
+
+body.halaman-login #login input[type="text"],
+body.halaman-login #login input[type="password"] {
+    padding: var(--s2);
+    border: 1px solid var(--marun);
+    border-radius: 2px;
+    background: #fff;
+}
+
+body.halaman-login #login input:focus-visible {
+    outline: 2px solid var(--kuning);
+    outline-offset: 2px;
+}
+
+.kolom-sandi { position: relative; }
+.kolom-sandi input { padding-right: 4.5em !important; }
+
+.kolom-sandi button {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+
+    width: auto !important;
+    margin: 0 !important;
+    padding: 6px 10px !important;
+
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--marun) !important;
+
+    font: 600 .9em / 1 "Cormorant Garamond", serif !important;
+    cursor: pointer;
+}
+
+.kolom-sandi button:hover,
+.kolom-sandi button:focus-visible { color: var(--hijau) !important; }
+
+/* Tombol sama dengan tombol .btn di undangan */
+body.halaman-login #login .tombol-masuk {
+    width: 100%;
+    margin-top: var(--s2);
+    padding: var(--s2) var(--s4);
+
+    border: 1px solid var(--hijau);
+    background: var(--hijau);
+    color: var(--kapur);
+
+    font: 600 var(--f0) / 1 "Cormorant Garamond", serif;
+    cursor: pointer;
+}
+
+body.halaman-login #login .tombol-masuk:hover,
+body.halaman-login #login .tombol-masuk:focus-visible {
+    background: var(--marun);
+    border-color: var(--marun);
+}
+
+body.halaman-login #login .pesan-login { text-align: left; }
+
+/* ---------- HP / tablet: foto jadi banner di atas ---------- */
+
+@media (max-width: 800px) {
+    .login-bagi { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+
+    .login-foto {
+        min-height: 36vh;
+        padding: var(--s4) var(--s3);
+        background-position: 38% 20%;
+    }
+
+    .login-foto .nama { font-size: clamp(2.6rem, 13vw, 3.6rem); }
+
+    body.halaman-login #login { padding: var(--s4) var(--s3) var(--s5); justify-content: flex-start; }
+    body.halaman-login #login::before,
+    body.halaman-login #login::after { display: none; }
+}

@@ -9,6 +9,21 @@ if (is_admin()) {
 
 $error = null;
 
+// Teks panel foto: ambil dari isi undangan; kalau gagal, pakai bawaan.
+$foto_judul = 'The Wedding of';
+$foto_nama  = ['Malik', 'Harsya'];
+$foto_tgl   = '';
+try {
+    require_once __DIR__ . '/includes/undangan.php';
+    $und = ambil_undangan();
+    $foto_judul = $und['cover_judul'];
+    $foto_tgl   = tanggal_indo($und['tanggal'], true);
+    $pg = ambil_pengantin();
+    if (isset($pg['pria'], $pg['wanita'])) $foto_nama = [nama_panggilan($pg['pria']), nama_panggilan($pg['wanita'])];
+} catch (Throwable $ex) {
+    error_log('Login: gagal memuat isi undangan: ' . $ex->getMessage());
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $now = time();
 
@@ -67,16 +82,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/login.css">
 
     <title>Login Admin</title>
 </head>
 
-<body>
+<body class="halaman-login">
+    <div class="login-bagi">
+
+    <aside class="login-foto" aria-hidden="true">
+        <p class="judul"><?= e($foto_judul) ?></p>
+        <p class="nama"><?= e($foto_nama[0]) ?> <span>&amp;</span> <?= e($foto_nama[1]) ?></p>
+        <?php if ($foto_tgl !== ''): ?><p class="tanggal"><?= e($foto_tgl) ?></p><?php endif; ?>
+    </aside>
+
     <main id="login">
+        <div class="login-isi">
 
         <a class="kembali-undangan" href="./">&larr; Kembali ke undangan</a>
 
-        <h1>Login</h1>
+        <h1>Login Admin</h1>
+
+        <span class="login-garis" aria-hidden="true"></span>
 
         <p class="login-sub">Khusus admin.</p>
 
@@ -95,13 +122,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="field">
                 <label for="login-password">Password</label>
-                <input type="password" id="login-password" name="password" autocomplete="current-password" required>
+                <div class="kolom-sandi">
+                    <input type="password" id="login-password" name="password" autocomplete="current-password" required>
+                    <button type="button" id="lihat-sandi" aria-controls="login-password" aria-pressed="false">Lihat</button>
+                </div>
             </div>
 
-            <button type="submit">Masuk</button>
+            <button type="submit" class="tombol-masuk">Masuk</button>
 
         </form>
 
+        </div>
     </main>
+
+    </div>
+
+    <script>
+        (function () {
+            var tombol = document.getElementById('lihat-sandi');
+            var isi = document.getElementById('login-password');
+            if (!tombol || !isi) return;
+            tombol.addEventListener('click', function () {
+                var tampil = isi.type === 'password';
+                isi.type = tampil ? 'text' : 'password';
+                tombol.textContent = tampil ? 'Sembunyi' : 'Lihat';
+                tombol.setAttribute('aria-pressed', tampil ? 'true' : 'false');
+            });
+        })();
+    </script>
 </body>
 </html>
