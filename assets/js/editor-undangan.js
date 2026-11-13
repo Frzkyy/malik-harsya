@@ -269,7 +269,16 @@
             credentials: 'same-origin'
         })
             .then(function (r) {
-                return r.json().catch(function () { return { ok: false, pesan: 'Balasan server tidak dikenali. Muat ulang halaman.' }; });
+                // Baca sebagai teks dulu: kalau bukan JSON, tampilkan isi balasan aslinya (error PHP, 403, 500, dll).
+                return r.text().then(function (t) {
+                    try { return JSON.parse(t); }
+                    catch (_) {
+                        var polos = t.replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>/gi, ' ')
+                            .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 400);
+                        console.error('Balasan server (HTTP ' + r.status + '):', t);
+                        return { ok: false, pesan: 'Error server HTTP ' + r.status + ': ' + (polos || '(balasan kosong, kemungkinan PHP fatal error / versi PHP terlalu lama)') };
+                    }
+                });
             })
             .then(function (d) {
                 if (!d.ok) { setStatus(d.pesan || 'Gagal menyimpan.', 'galat'); return; }
@@ -290,7 +299,7 @@
                 setStatus('Tersimpan pukul ' + jam + '.', 'ok');
                 jadwalkanKirim();
             })
-            .catch(function () { setStatus('Tidak bisa terhubung ke server. Coba lagi.', 'galat'); })
+            .catch(function (err) { setStatus('Tidak bisa terhubung ke server: ' + (err && err.message ? err.message : err), 'galat'); })
             .then(function () { tombolSimpan.disabled = false; });
     });
 })();

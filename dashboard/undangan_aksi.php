@@ -1,4 +1,27 @@
 <?php
+// Semua error PHP (fatal, warning, exception) dikirim ke editor sebagai JSON berisi pesan aslinya.
+ini_set('display_errors', '0');
+ob_start();
+$GLOBALS['_aksi_json'] = stripos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false;
+function _aksi_error_json($pesan) {
+    if (!$GLOBALS['_aksi_json']) return;
+    while (ob_get_level() > 0) ob_end_clean();
+    if (!headers_sent()) { http_response_code(500); header('Content-Type: application/json; charset=utf-8'); }
+    echo json_encode(['ok' => false, 'pesan' => $pesan], JSON_UNESCAPED_UNICODE);
+}
+set_error_handler(function ($no, $str, $file, $line) {
+    if (!(error_reporting() & $no)) return false;
+    throw new ErrorException($str, 0, $no, $file, $line);
+});
+set_exception_handler(function ($e) {
+    _aksi_error_json(get_class($e) . ': ' . $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')');
+});
+register_shutdown_function(function () {
+    $e = error_get_last();
+    if ($e && in_array($e['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        _aksi_error_json('PHP fatal: ' . $e['message'] . ' (' . basename($e['file']) . ':' . $e['line'] . ')');
+    }
+});
 // Handler POST editor Undangan (tab Undangan di dashboard): simpan teks, tanggal, jam, gambar,
 // alamat, galeri (foto + tata letak), dan daftar cerita -- semuanya dalam SATU transaksi.
 // Dipanggil lewat fetch (balasan JSON) dari assets/js/editor-undangan.js;
@@ -12,9 +35,10 @@ require_once __DIR__ . '/../includes/cerita.php';
 
 $json = stripos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false;
 
-function selesai_undangan(bool $json, bool $ok, string $pesan, array $tambahan = [], int $kode = 200): never
+function selesai_undangan(bool $json, bool $ok, string $pesan, array $tambahan = [], int $kode = 200)
 {
     if ($json) {
+        while (ob_get_level() > 0) ob_end_clean();
         http_response_code($kode);
         header('Content-Type: application/json; charset=utf-8');
         header('Cache-Control: no-store');
