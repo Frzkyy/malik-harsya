@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Body melebihi post_max_size -> $_POST & $_FILES dikosongkan PHP.
 if (empty($_POST) && empty($_FILES) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
-    selesai_undangan($json, false, 'Total ukuran gambar terlalu besar. Simpan beberapa gambar sekali saja (maksimal 12 MB per gambar).', [], 413);
+    selesai_undangan($json, false, 'Total ukuran file terlalu besar. Simpan beberapa file sekali saja (maksimal 12 MB per gambar, 10 MB untuk musik).', [], 413);
 }
 
 if (!csrf_valid($_POST['csrf'] ?? null)) {
@@ -134,6 +134,7 @@ $kolom_foto = [
     'akad_foto'    => 'Foto akad nikah',
     'resepsi_foto' => 'Foto resepsi',
     'alamat_foto'  => 'Foto lokasi',
+    'gift_qris_foto' => 'Gambar QRIS',
 ];
 
 $baru = [];          // kolom file => hasil simpan_gambar
@@ -167,6 +168,18 @@ if ($daftar_cerita !== null) {
     }
 }
 
+// Musik latar (audio): diproses sendiri; hasilnya disimpan di $baru supaya ikut dibersihkan kalau ada yang gagal.
+if (isset($_FILES['musik_file']) && ($_FILES['musik_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+    try {
+        $baru['musik_file'] = simpan_audio($_FILES['musik_file']);
+    } catch (Throwable $ex) {
+        $bersihkan();
+        $pesan = $ex instanceof RuntimeException ? $ex->getMessage() : 'Gagal memproses musik.';
+        if (!($ex instanceof RuntimeException)) error_log('Simpan undangan: ' . $ex->getMessage());
+        selesai_undangan($json, false, 'Musik: ' . $pesan, [], 422);
+    }
+}
+
 foreach ($tugas as [$tujuan, $kunci, $berkas, $label]) {
     try {
         $hasil = simpan_gambar($berkas);
@@ -187,6 +200,7 @@ $lama = [];            // path gambar lama yang dihapus setelah transaksi berhas
 $peta_galeri = [];     // kunci n* -> ['k' => 'g<id>', 'file' => ...]
 $peta_cerita = [];     // kunci n* -> ['k' => 'c<id>', 'foto' => ...]
 $ganti_cerita = [];    // kunci c* -> path foto baru (foto cerita lama diganti)
+$berkas_hapus = [];    // kunci berkas (QRIS / musik) yang dikosongkan
 
 try {
     $undangan_lama = ambil_undangan();
@@ -198,6 +212,17 @@ try {
         if (isset($baru[$k])) {
             $nilai[$k] = $baru[$k]['file'];
             $lama[] = $undangan_lama[$k];
+        }
+    }
+    // Berkas QRIS & musik: ganti kalau ada unggahan baru, kosongkan kalau "hapus" dicentang.
+    foreach (UNDANGAN_KUNCI_BERKAS as $k) {
+        if (isset($baru[$k])) {
+            $nilai[$k] = $baru[$k]['file'];
+            $lama[] = $undangan_lama[$k];
+        } elseif (($_POST[$k . '_hapus'] ?? '') === '1' && $undangan_lama[$k] !== '') {
+            $nilai[$k] = '';
+            $lama[] = $undangan_lama[$k];
+            $berkas_hapus[] = $k;
         }
     }
     simpan_undangan($pdo, $nilai);
@@ -298,4 +323,5 @@ selesai_undangan($json, true, 'Perubahan disimpan.', [
     'galeri_baru'  => $peta_galeri,    // kunci sementara -> kunci tetap + path
     'cerita_baru'  => $peta_cerita,
     'cerita_foto'  => $ganti_cerita,   // kunci cerita lama -> path foto baru
+    'berkas_hapus' => $berkas_hapus,   // QRIS / musik yang dihapus
 ]);

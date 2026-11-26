@@ -11,7 +11,7 @@
 
 <section class="kartu pengaturan-reset">
     <h2>Reset semua</h2>
-    <p>Mengembalikan <strong>seluruh isi landing page</strong> ke bawaan: tanggal, jam acara, alamat, kata pengantar, ucapan, nama &amp; biodata pengantin, cerita, galeri, dan semua foto. Foto yang pernah diunggah akan dihapus. Data RSVP, daftar tamu, dan akun admin <strong>tidak</strong> berubah. Tindakan ini tidak bisa dibatalkan.</p>
+    <p>Mengembalikan <strong>seluruh isi landing page</strong> ke bawaan: tanggal, jam acara, alamat, kata pengantar, ucapan, nama &amp; biodata pengantin, cerita, galeri, Gift (QRIS &amp; rekening), musik, dan semua foto. Foto, gambar QRIS, dan musik yang pernah diunggah akan dihapus. Data RSVP, daftar tamu, dan akun admin <strong>tidak</strong> berubah. Tindakan ini tidak bisa dibatalkan.</p>
 
     <?php if (is_superadmin()): ?>
         <form action="pengaturan_aksi.php" method="post" onsubmit="return confirm('Yakin ingin mereset SEMUA isi landing page (teks, tanggal, foto, galeri, cerita, nama pengantin) ke bawaan? Tindakan ini tidak bisa dibatalkan.') && prompt('Ketik RESET untuk melanjutkan') === 'RESET';">

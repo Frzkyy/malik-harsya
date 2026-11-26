@@ -24,7 +24,8 @@
         'galeri': 'galeri',
         'story': 'cerita',
         'ucapan': 'ucapan',
-        'rsvp': 'rsvp'
+        'rsvp': 'rsvp',
+        'gift': 'gift'
     };
 
     function $(sel) { return document.querySelector(sel); }
@@ -212,6 +213,56 @@
         Object.keys(ada).forEach(function (k) { if (!dipakai[k]) ada[k].remove(); });
     }
 
+    /** Gift: kartu QRIS & transfer. Aturan tampil sama dengan gift_qris_tampil() / gift_bank_tampil() di includes/undangan.php. */
+    function gift(d) {
+        if (d.gift_judul === undefined) return;
+        isiTeks($('#gift-judul'), d.gift_judul);
+        isiTeks($('#gift-deskripsi'), d.gift_deskripsi);
+
+        var qris = $('#gift-qris');
+        var adaQris = false;
+        if (qris) {
+            var fotoQris = d.gift_qris_foto_hapus === '1' ? '' : (d.gift_qris_foto || '');
+            adaQris = d.gift_qris_aktif === '1' && !!fotoQris;
+            qris.hidden = !adaQris;
+            isiTeks($('#gift-qris-judul'), d.gift_qris_judul);
+            var namaQ = $('#gift-qris-nama');
+            if (namaQ) { isiTeks(namaQ, d.gift_qris_nama); namaQ.hidden = !(d.gift_qris_nama || '').trim(); }
+            if (fotoQris) {
+                ubahGambar($('#gift-qris-foto'), fotoQris);
+                var unduh = $('#gift-qris-unduh');
+                if (unduh) unduh.setAttribute('href', fotoQris);
+            }
+        }
+
+        var bank = $('#gift-bank');
+        var adaBank = false;
+        if (bank) {
+            var polos = (d.gift_bank_nomor || '').replace(/\D+/g, '');
+            adaBank = d.gift_bank_aktif === '1' && !!polos;
+            bank.hidden = !adaBank;
+            isiTeks($('#gift-bank-judul'), d.gift_bank_judul);
+            var namaB = $('#gift-bank-nama');
+            if (namaB) {
+                isiTeks(namaB, d.gift_bank_nama ? 'a.n. ' + d.gift_bank_nama : '');
+                namaB.hidden = !(d.gift_bank_nama || '').trim();
+            }
+            isiTeks($('#gift-bank-nomor'), d.gift_bank_nomor);
+            var salin = $('#gift-bank-salin');
+            if (salin) salin.setAttribute('data-nomor', polos);
+        }
+
+        var sec = $('#gift');
+        if (sec) sec.hidden = !(adaQris || adaBank);
+    }
+
+    /** Tombol musik melayang: tampil kalau musik aktif dan ada file (tidak berbunyi di pratinjau). */
+    function musik(d) {
+        var t = $('#musik-tombol');
+        if (!t || d.musik_aktif === undefined) return;
+        t.hidden = !(d.musik_aktif === '1' && d.musik_ada);
+    }
+
     function terapkan(d) {
         // 1. Cover (nama tamu sengaja TIDAK disentuh)
         isiTeks($('#wedding-title'), d.cover_judul);
@@ -252,6 +303,8 @@
         isiTeks($('#rsvp-deskripsi'), d.rsvp_deskripsi);
         isiTeks($('#ucapan-doa-judul'), d.ucapan_doa_judul);
         isiTeks($('#ucapan-kosong'), d.ucapan_kosong);
+        gift(d);
+        musik(d);
     }
 
     function gulirKe(id) {
@@ -271,6 +324,12 @@
         if (tautan) {
             e.preventDefault();
             e.stopPropagation();   // mis. lightbox galeri tidak ikut terbuka di pratinjau
+        }
+
+        // Klik tombol musik melayang -> editor membuka bagian Musik.
+        if (e.target.closest && e.target.closest('#musik-tombol')) {
+            window.parent.postMessage({ type: 'undangan:fokus', bagian: 'musik' }, ASAL);
+            return;
         }
 
         // Klik bagian undangan -> editor membuka bagian yang sesuai.

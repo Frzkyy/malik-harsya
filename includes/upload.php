@@ -12,6 +12,60 @@ const UNGGAH_TIPE  = [
     'image/webp' => 'webp',
 ];
 
+const UNGGAH_AUDIO_MAKS = 10 * 1024 * 1024;   // 10 MB untuk musik latar
+
+/**
+ * Jenis audio dari isi file (bukan ekstensi/MIME kiriman browser): mp3, ogg, m4a, wav; null kalau bukan audio yang didukung.
+ */
+function jenis_audio(string $tmp): ?string
+{
+    $h = @file_get_contents($tmp, false, null, 0, 16);
+    if ($h === false || strlen($h) < 12) return null;
+    if (substr($h, 0, 3) === 'ID3') return 'mp3';
+    if (ord($h[0]) === 0xFF && (ord($h[1]) & 0xE0) === 0xE0) return 'mp3';
+    if (substr($h, 0, 4) === 'OggS') return 'ogg';
+    if (substr($h, 4, 4) === 'ftyp') return 'm4a';
+    if (substr($h, 0, 4) === 'RIFF' && substr($h, 8, 4) === 'WAVE') return 'wav';
+    return null;
+}
+
+/**
+ * Simpan satu file audio hasil $_FILES (musik latar). Nama & ekstensi dibuat sendiri dari isi file.
+ * @return array{file: string}  file = path relatif (media/unggahan/xxx.mp3)
+ * @throws RuntimeException pesan aman untuk ditampilkan ke admin
+ */
+function simpan_audio(array $f): array
+{
+    $err = $f['error'] ?? UPLOAD_ERR_NO_FILE;
+    if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
+        throw new RuntimeException('Ukuran file terlalu besar (maksimal 10 MB, dan tidak boleh melebihi batas upload server).');
+    }
+    if ($err !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'] ?? '')) {
+        throw new RuntimeException('File gagal diunggah.');
+    }
+    if (($f['size'] ?? 0) > UNGGAH_AUDIO_MAKS) {
+        throw new RuntimeException('Ukuran file terlalu besar (maksimal 10 MB).');
+    }
+
+    $ext = jenis_audio($f['tmp_name']);
+    if ($ext === null) {
+        throw new RuntimeException('Format tidak didukung. Gunakan MP3, OGG, M4A, atau WAV.');
+    }
+
+    $dir = APP_ROOT . '/' . UNGGAH_DIR;
+    if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+        throw new RuntimeException('Folder unggahan tidak bisa dibuat.');
+    }
+
+    $nama = bin2hex(random_bytes(10)) . '.' . $ext;
+    if (!move_uploaded_file($f['tmp_name'], $dir . '/' . $nama)) {
+        throw new RuntimeException('Gagal menyimpan musik. Periksa izin tulis folder ' . UNGGAH_DIR . '/.');
+    }
+    @chmod($dir . '/' . $nama, 0644);
+
+    return ['file' => UNGGAH_DIR . '/' . $nama];
+}
+
 /**
  * Simpan satu file hasil $_FILES.
  * @return array{file: string, lebar: int, tinggi: int}  file = path relatif (media/unggahan/xxx.jpg)
@@ -103,10 +157,10 @@ function simpan_gambar(array $f): array
     return ['file' => UNGGAH_DIR . '/' . $nama, 'lebar' => $w, 'tinggi' => $h];
 }
 
-/** Hapus file hanya kalau memang hasil unggahan (foto bawaan di media/ tidak disentuh). */
+/** Hapus file hanya kalau memang hasil unggahan (foto bawaan di media/ tidak disentuh). Termasuk file musik. */
 function hapus_unggahan(string $path): void
 {
-    if (!preg_match('#^' . preg_quote(UNGGAH_DIR, '#') . '/[a-f0-9]{20}\.(jpg|png|webp)$#', $path)) return;
+    if (!preg_match('#^' . preg_quote(UNGGAH_DIR, '#') . '/[a-f0-9]{20}\.(jpg|png|webp|mp3|ogg|m4a|wav)$#', $path)) return;
     $full = APP_ROOT . '/' . $path;
     if (is_file($full)) @unlink($full);
 }

@@ -123,6 +123,12 @@ function orang_tua(array $p): string
 
 $und = ambil_undangan();   // teks, tanggal, jam & gambar yang diedit dari dashboard
 
+$qris_tampil = gift_qris_tampil($und);
+$bank_tampil = gift_bank_tampil($und);
+$musik_tampil = musik_tampil($und);
+$musik_src    = url_gambar_aman((string) $und['musik_file'], '');
+$qris_src     = url_gambar_aman((string) $und['gift_qris_foto'], '');
+
 $nama_pria   = isset($pengantin['pria'])   ? nama_panggilan($pengantin['pria'])   : 'Malik';
 $nama_wanita = isset($pengantin['wanita']) ? nama_panggilan($pengantin['wanita']) : 'Harsya';
 $nama_pria   = $nama_pria   !== '' ? $nama_pria   : 'Malik';
@@ -140,6 +146,18 @@ function tgl_ucapan(string $utc, array $bulan): string
     } catch (Throwable $ex) {
         return '';
     }
+}
+
+/** Tombol musik di gerbang tamu: nyala = musik diputar otomatis begitu tamu masuk (klik itulah yang mengizinkan suara). */
+function gerbang_musik(bool $tampil, array $und): void
+{
+    if (!$tampil) return;
+    ?>
+    <button type="button" class="gerbang-musik" id="gerbang-musik" aria-pressed="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+        <span class="gerbang-musik-teks">Musik: <strong id="gerbang-musik-status">Nyala</strong><?php if (trim((string) $und['musik_judul']) !== ''): ?><small><?= e($und['musik_judul']) ?></small><?php endif; ?></span>
+    </button>
+    <?php
 }
 ?>
 <!DOCTYPE html>
@@ -173,6 +191,7 @@ function tgl_ucapan(string $utc, array $bulan): string
                 <?php if ($gerbang === 'sambut'): ?>
                     <p class="gerbang-sapa">Kepada Yth.<br><strong><?= e($nama_tamu) ?></strong></p>
                     <button type="button" id="gerbang-buka">Buka Undangan</button>
+                    <?php gerbang_musik($musik_tampil, $und); ?>
                 <?php else: ?>
                     <p class="gerbang-sapa">Masukkan nama Anda sebagaimana tertulis di undangan.</p>
 
@@ -189,6 +208,7 @@ function tgl_ucapan(string $utc, array $bulan): string
                         <input type="hidden" name="aksi" value="guest">
                         <button type="submit" class="btn-sekunder">Lihat sebagai tamu</button>
                     </form>
+                    <?php gerbang_musik($musik_tampil, $und); ?>
                 <?php endif; ?>
             </div>
         </section>
@@ -491,10 +511,61 @@ function tgl_ucapan(string $utc, array $bulan): string
 
         </section>
 
+        <?php if ($qris_tampil || $bank_tampil || $pratinjau): ?>
+        <section id="gift"<?= ($qris_tampil || $bank_tampil) ? '' : ' hidden' ?>>
+
+            <h1 id="gift-judul"><?= e($und['gift_judul']) ?></h1>
+
+            <img class="ornamen-gift" src="media/ornamen-lurus-tengah-1.png" alt="">
+
+            <p id="gift-deskripsi"><?= nl2br(e($und['gift_deskripsi'])) ?></p>
+
+            <div class="gift-daftar">
+
+                <?php if ($qris_tampil || $pratinjau): ?>
+                    <article class="gift-kartu" id="gift-qris"<?= $qris_tampil ? '' : ' hidden' ?>>
+                        <h2 id="gift-qris-judul"><?= e($und['gift_qris_judul']) ?></h2>
+                        <p class="gift-pemilik" id="gift-qris-nama"<?= trim((string) $und['gift_qris_nama']) === '' ? ' hidden' : '' ?>><?= e($und['gift_qris_nama']) ?></p>
+                        <img class="gift-qr" id="gift-qris-foto" src="<?= e($qris_src) ?>" alt="Kode QRIS" loading="lazy" decoding="async">
+                        <p class="gift-petunjuk">Pindai dengan aplikasi bank atau e-wallet Anda.</p>
+                        <a class="btn" id="gift-qris-unduh" href="<?= e($qris_src) ?>" download="QRIS.<?= e(pathinfo($qris_src, PATHINFO_EXTENSION) ?: 'png') ?>">Unduh QRIS</a>
+                    </article>
+                <?php endif; ?>
+
+                <?php if ($bank_tampil || $pratinjau): ?>
+                    <article class="gift-kartu" id="gift-bank"<?= $bank_tampil ? '' : ' hidden' ?>>
+                        <h2 id="gift-bank-judul"><?= e($und['gift_bank_judul']) ?></h2>
+                        <p class="gift-pemilik" id="gift-bank-nama"<?= trim((string) $und['gift_bank_nama']) === '' ? ' hidden' : '' ?>>a.n. <?= e($und['gift_bank_nama']) ?></p>
+                        <p class="gift-nomor" id="gift-bank-nomor"><?= e($und['gift_bank_nomor']) ?></p>
+                        <button type="button" class="gift-salin" id="gift-bank-salin" data-nomor="<?= e(gift_nomor_polos((string) $und['gift_bank_nomor'])) ?>">Salin Nomor</button>
+                    </article>
+                <?php endif; ?>
+
+            </div>
+
+        </section>
+        <?php endif; ?>
+
     </main>
+
+    <?php if ($musik_tampil || $pratinjau): ?>
+        <?php /* Musik latar. Tombol melayang ikut tergulir bersama tamu; baru muncul setelah tamu masuk (gerbang naik). */ ?>
+        <?php if ($musik_tampil && !$pratinjau): ?>
+            <audio id="musik-audio" src="<?= e($musik_src) ?>" data-volume="<?= musik_volume($und) ?>" loop preload="none"></audio>
+        <?php endif; ?>
+        <button type="button" id="musik-tombol" class="musik-tombol" aria-pressed="false" aria-label="Putar musik" title="Musik"<?= ($musik_tampil && $gerbang === '') || ($pratinjau && $musik_tampil) ? '' : ' hidden' ?>>
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+                <path class="musik-ikon" fill="currentColor" d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
+                <path class="musik-coret" d="M4 4l16 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+            </svg>
+        </button>
+    <?php endif; ?>
 
     <?php if ($pratinjau): ?>
         <script src="assets/js/pratinjau.js"></script>
+    <?php else: ?>
+        <?php if ($musik_tampil): ?><script src="assets/js/musik.js"></script><?php endif; ?>
+        <?php if ($bank_tampil): ?><script src="assets/js/gift.js"></script><?php endif; ?>
     <?php endif; ?>
 
     <script>
@@ -513,6 +584,7 @@ function tgl_ucapan(string $utc, array $bulan): string
         function naik() {
             gerbang.classList.add('naik');
             document.body.classList.remove('terkunci');
+            if (window.Musik) window.Musik.masuk();   // tombol musik melayang muncul
             window.scrollTo(0, 0);
             // Cadangan kalau animasi dimatikan (reduced motion): tetap disingkirkan.
             setTimeout(function () { gerbang.remove(); }, 1100);
@@ -542,19 +614,23 @@ function tgl_ucapan(string $utc, array $bulan): string
                 tampilError('');
                 var tombol = el.querySelector('button');
                 tombol.disabled = true;
+                if (window.Musik) window.Musik.siapkan();   // di dalam klik tamu: izin browser untuk memutar suara
                 fetch('masuk.php', { method: 'POST', body: new FormData(el), headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
                     .then(function (r) { return r.json(); })
                     .then(function (d) {
-                        if (d.ok) { terapkan(d); naik(); } else { tampilError(d.pesan || 'Gagal masuk.'); }
+                        if (d.ok) { terapkan(d); naik(); } else { if (window.Musik) window.Musik.batal(); tampilError(d.pesan || 'Gagal masuk.'); }
                     })
-                    .catch(function () { tampilError('Tidak bisa terhubung. Coba lagi.'); })
+                    .catch(function () { if (window.Musik) window.Musik.batal(); tampilError('Tidak bisa terhubung. Coba lagi.'); })
                     .then(function () { tombol.disabled = false; });
             });
         }
 
         if (form) kirim(form);
         if (guest) kirim(guest);
-        if (buka) buka.addEventListener('click', naik);
+        if (buka) buka.addEventListener('click', function () {
+            if (window.Musik) window.Musik.siapkan();
+            naik();
+        });
         if (form) document.getElementById('gerbang-nama').focus();
     })();
     </script>

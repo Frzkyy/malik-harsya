@@ -5,7 +5,7 @@
 // penyimpanan: dashboard/undangan_aksi.php, nilai bawaan & validasi: includes/undangan.php.
 //
 // Bagian: 1 Cover, 2 Kata pengantar, 3 Mempelai, 4 Tempat & waktu, 5 Alamat, 6 Galeri,
-//         7 Cerita kami, 8 Ucapan, 9 RSVP + Ucapan & Doa.
+//         7 Cerita kami, 8 Ucapan, 9 RSVP + Ucapan & Doa, 10 Gift (QRIS & SeaBank), 11 Musik.
 
 require_once __DIR__ . '/../../includes/undangan.php';
 require_once __DIR__ . '/../../includes/galeri.php';
@@ -75,15 +75,36 @@ function ed_tanggal(string $nilai, string $ket): void
 <?php }
 
 /** Pilih gambar + miniatur. Nama field file = kunci di undangan_aksi.php. */
-function ed_foto(string $nama, string $label, string $path): void
+function ed_foto(string $nama, string $label, string $path, bool $bisa_hapus = false): void
 { ?>
     <div class="ed-foto" data-foto="<?= e($nama) ?>" data-path="<?= e($path) ?>">
-        <img class="ed-thumb" src="../<?= e($path) ?>" alt="">
-        <label class="ed-field">
-            <span class="ed-label"><?= e($label) ?> <small>(opsional)</small></span>
-            <input type="file" name="<?= e($nama) ?>" accept="image/jpeg,image/png,image/webp">
-            <small class="ed-ket">JPG/PNG/WebP, maks. 12 MB. Kosongkan kalau tidak ingin mengganti.</small>
+        <img class="ed-thumb" src="<?= $path !== '' ? '../' . e($path) : '' ?>" alt=""<?= $path === '' ? ' hidden' : '' ?>>
+        <div class="ed-foto-isi">
+            <label class="ed-field">
+                <span class="ed-label"><?= e($label) ?> <small>(opsional)</small></span>
+                <input type="file" name="<?= e($nama) ?>" accept="image/jpeg,image/png,image/webp">
+                <small class="ed-ket">JPG/PNG/WebP, maks. 12 MB. Kosongkan kalau tidak ingin mengganti.</small>
+            </label>
+            <?php if ($bisa_hapus): ?>
+                <span class="ed-hapus"<?= $path === '' ? ' hidden' : '' ?>>
+                    <input type="hidden" name="<?= e($nama) ?>_hapus" value="0">
+                    <label class="ed-cek"><input type="checkbox" name="<?= e($nama) ?>_hapus" value="1"> Hapus gambar ini</label>
+                </span>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php }
+
+/** Saklar nyala/mati (checkbox + hidden "0" supaya nilai tidak hilang saat tidak dicentang). */
+function ed_saklar(string $nama, string $label, string $nilai, string $ket = ''): void
+{ ?>
+    <div class="ed-field ed-saklar">
+        <input type="hidden" name="<?= e($nama) ?>" value="0">
+        <label class="ed-cek ed-cek-besar">
+            <input type="checkbox" name="<?= e($nama) ?>" value="1"<?= $nilai === '1' ? ' checked' : '' ?>>
+            <span><?= e($label) ?></span>
         </label>
+        <?php if ($ket !== ''): ?><small class="ed-ket"><?= e($ket) ?></small><?php endif; ?>
     </div>
 <?php }
 
@@ -299,6 +320,62 @@ function ed_mempelai(string $jenis, string $judul, array $m): void
             </div>
         </details>
 
+        <!-- 10. Gift -->
+        <details class="bagian" name="bagian-undangan" data-bagian="gift" data-sasaran="gift">
+            <summary><span class="no">10</span> Gift (QRIS &amp; SeaBank)</summary>
+            <div class="bagian-isi">
+                <?php ed_teks('gift_judul', 'Judul', $und['gift_judul'], 40, true); ?>
+                <?php ed_area('gift_deskripsi', 'Deskripsi', $und['gift_deskripsi'], 400, 3); ?>
+
+                <fieldset class="ed-sub" data-sasaran="gift-qris">
+                    <legend>QRIS</legend>
+                    <?php ed_saklar('gift_qris_aktif', 'Tampilkan kartu QRIS', $und['gift_qris_aktif'], 'Kartu baru tampil di undangan setelah gambar QRIS diunggah.'); ?>
+                    <?php ed_teks('gift_qris_judul', 'Judul kartu', $und['gift_qris_judul'], 30, true); ?>
+                    <?php ed_teks('gift_qris_nama', 'Nama pemilik / merchant', $und['gift_qris_nama'], 100); ?>
+                    <?php ed_foto('gift_qris_foto', 'Gambar QRIS', (string) $und['gift_qris_foto'], true); ?>
+                </fieldset>
+
+                <fieldset class="ed-sub" data-sasaran="gift-bank">
+                    <legend>Transfer bank</legend>
+                    <?php ed_saklar('gift_bank_aktif', 'Tampilkan kartu transfer', $und['gift_bank_aktif']); ?>
+                    <?php ed_teks('gift_bank_judul', 'Nama bank', $und['gift_bank_judul'], 30, true, 'Mis. SeaBank'); ?>
+                    <?php ed_teks('gift_bank_nama', 'Nama pemilik rekening', $und['gift_bank_nama'], 100); ?>
+                    <label class="ed-field">
+                        <span class="ed-label">Nomor rekening</span>
+                        <input type="text" name="gift_bank_nomor" value="<?= e($und['gift_bank_nomor']) ?>" maxlength="30" inputmode="numeric" autocomplete="off">
+                        <small class="ed-ket">Angka saja (boleh dengan spasi/tanda hubung). Tombol &ldquo;Salin&rdquo; di undangan menyalin angkanya saja.</small>
+                    </label>
+                </fieldset>
+            </div>
+        </details>
+
+        <!-- 11. Musik -->
+        <details class="bagian" name="bagian-undangan" data-bagian="musik" data-sasaran="cover-image">
+            <summary><span class="no">11</span> Musik Latar</summary>
+            <div class="bagian-isi" id="musik-editor" data-path="<?= e((string) $und['musik_file']) ?>">
+                <?php ed_saklar('musik_aktif', 'Aktifkan musik', $und['musik_aktif'], 'Menampilkan tombol musik di halaman masuk tamu dan tombol musik melayang di undangan. Perlu file musik.'); ?>
+                <?php ed_teks('musik_judul', 'Judul lagu', $und['musik_judul'], 80, false, 'Tampil di samping tombol musik pada halaman masuk tamu.'); ?>
+
+                <div class="ed-field ed-musik">
+                    <span class="ed-label">File musik <small>(opsional bila sudah ada)</small></span>
+                    <audio id="musik-dengar" controls preload="none"<?= $und['musik_file'] === '' ? ' hidden' : ' src="../' . e((string) $und['musik_file']) . '"' ?>></audio>
+                    <p class="ed-ket" id="musik-kosong"<?= $und['musik_file'] === '' ? '' : ' hidden' ?>>Belum ada musik diunggah.</p>
+                    <input type="file" name="musik_file" id="musik-berkas" accept=".mp3,.ogg,.m4a,.wav,audio/mpeg,audio/ogg,audio/mp4,audio/wav">
+                    <small class="ed-ket" id="musik-ket">MP3/OGG/M4A/WAV, maks. 10 MB. Kosongkan kalau tidak ingin mengganti.</small>
+                    <span class="ed-hapus" id="musik-hapus-wadah"<?= $und['musik_file'] === '' ? ' hidden' : '' ?>>
+                        <input type="hidden" name="musik_file_hapus" value="0">
+                        <label class="ed-cek"><input type="checkbox" name="musik_file_hapus" value="1"> Hapus musik ini</label>
+                    </span>
+                </div>
+
+                <label class="ed-field">
+                    <span class="ed-label">Volume awal <small>(5-100)</small></span>
+                    <input type="number" name="musik_volume" value="<?= musik_volume($und) ?>" min="5" max="100" step="5" inputmode="numeric" required>
+                </label>
+                <p class="ed-catatan">Musik diputar otomatis saat tamu menekan <em>Masuk</em>, <em>Buka Undangan</em>, atau <em>Lihat sebagai tamu</em> (selama tombol musik di halaman masuk dalam keadaan nyala). Browser hanya mengizinkan suara otomatis setelah ada klik, karena itu tombol itu diletakkan di sana. Tombol musik melayang membiarkan tamu menyalakan/mematikannya kapan saja. Di pratinjau, musik tidak diputar.</p>
+            </div>
+        </details>
+
         <div class="ed-bar">
             <span id="ed-status" class="ed-status" role="status" aria-live="polite">Belum ada perubahan.</span>
             <button type="submit" class="tombol utama" id="ed-simpan">Simpan perubahan</button>
@@ -328,3 +405,4 @@ function ed_mempelai(string $jenis, string $judul, array $m): void
 <script src="../assets/js/editor-undangan.js" defer></script>
 <script src="../assets/js/editor-galeri.js" defer></script>
 <script src="../assets/js/editor-cerita.js" defer></script>
+<script src="../assets/js/editor-gift-musik.js" defer></script>

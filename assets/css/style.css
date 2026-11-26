@@ -1422,6 +1422,221 @@ body.terkunci {
     margin-top: var(--s2);
 }
 
+/* Gift: QRIS & transfer bank */
+
+#gift {
+    padding: var(--s7) var(--pad);
+
+    background: var(--kapur-2);
+    text-align: center;
+}
+
+#gift .ornamen-gift {
+    display: block;
+
+    width: 200px;
+    max-width: 35%;
+    margin: var(--s2) auto var(--s3);
+}
+
+#gift > p {
+    max-width: 30em;
+    margin: 0 auto var(--s5);
+
+    color: var(--marun);
+    font-size: var(--f1);
+    line-height: 1.5;
+}
+
+.gift-daftar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    gap: var(--s4);
+
+    max-width: 52em;
+    margin: 0 auto;
+}
+
+.gift-kartu {
+    display: flex;
+    flex: 1 1 17em;
+    flex-direction: column;
+    align-items: center;
+
+    max-width: 24em;
+    padding: var(--s4) var(--s3);
+
+    border: 1px solid var(--kuning);
+    background: var(--kapur);
+}
+
+.gift-kartu h2 {
+    color: var(--hijau);
+    font-size: var(--f2);
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+.gift-pemilik {
+    margin-top: var(--s1);
+
+    color: var(--marun);
+    font-weight: 600;
+}
+
+.gift-qr {
+    display: block;
+
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    margin: var(--s3) auto var(--s2);
+    padding: var(--s1);
+
+    border: 1px solid var(--kapur-2);
+    background: #fff;
+}
+
+.gift-petunjuk {
+    color: var(--marun);
+    font-size: .85em;
+    line-height: 1.4;
+}
+
+.gift-nomor {
+    width: 100%;
+    margin-top: var(--s3);
+    padding: var(--s2) var(--s3);
+
+    border: 1px dashed var(--kuning);
+    background: var(--kapur-2);
+    color: var(--hijau);
+
+    font-size: var(--f2);
+    font-weight: 700;
+    letter-spacing: .08em;
+    overflow-wrap: anywhere;
+}
+
+.gift-kartu .btn,
+.gift-kartu button {
+    margin-top: var(--s3);
+}
+
+/* Musik: tombol di gerbang tamu */
+
+#gerbang .gerbang-musik {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s1);
+
+    width: auto;
+    margin: var(--s3) auto 0;
+    padding: var(--s1) var(--s3);
+
+    border: 1px solid rgba(242, 243, 240, .45);
+    border-radius: 999px;
+
+    background: transparent;
+    color: var(--kapur);
+
+    font-size: .9em;
+    line-height: 1.3;
+    text-align: left;
+}
+
+#gerbang .gerbang-musik:hover {
+    border-color: var(--kuning);
+    background: rgba(255, 255, 255, .12);
+    color: var(--kapur);
+}
+
+#gerbang .gerbang-musik.mati {
+    opacity: .75;
+}
+
+.gerbang-musik svg {
+    flex: none;
+    color: var(--kuning);
+}
+
+.gerbang-musik.mati svg {
+    opacity: .5;
+}
+
+.gerbang-musik-teks small {
+    display: block;
+
+    font-size: .8em;
+    font-weight: 500;
+    opacity: .8;
+}
+
+/* Musik: tombol melayang (ikut tergulir bersama tamu) */
+
+.musik-tombol {
+    position: fixed;
+    right: var(--s3);
+    bottom: max(var(--s3), env(safe-area-inset-bottom));
+    z-index: 900;
+
+    display: grid;
+    place-items: center;
+
+    width: 48px;
+    height: 48px;
+    margin: 0;
+    padding: 0;
+
+    border: 1px solid var(--kuning);
+    border-radius: 50%;
+
+    background: var(--hijau);
+    color: var(--kuning);
+
+    box-shadow: 0 4px 16px rgba(27, 42, 65, .35);
+}
+
+.musik-tombol:hover {
+    border-color: var(--kuning);
+    background: var(--hijau-2);
+}
+
+.musik-tombol svg {
+    display: block;
+}
+
+.musik-tombol.bunyi .musik-coret {
+    display: none;
+}
+
+.musik-tombol.bunyi svg {
+    animation: musik-putar 4s linear infinite;
+}
+
+.musik-tombol.muncul {
+    animation: musik-muncul .7s ease both;
+}
+
+@keyframes musik-putar {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes musik-muncul {
+    from { opacity: 0; transform: translateY(16px) scale(.8); }
+    to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .musik-tombol.bunyi svg,
+    .musik-tombol.muncul {
+        animation: none;
+    }
+}
+
 [hidden] {
     display: none !important;
 }

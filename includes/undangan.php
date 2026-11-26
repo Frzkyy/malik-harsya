@@ -58,10 +58,32 @@ const UNDANGAN_BAWAAN = [
     'rsvp_deskripsi'   => 'Mohon konfirmasi kehadiran Anda agar kami dapat mempersiapkan segalanya dengan sebaik mungkin.',
     'ucapan_doa_judul' => 'Ucapan & Doa',
     'ucapan_kosong'    => 'Belum ada ucapan. Jadilah yang pertama menyampaikan doa.',
+
+    // 10. Gift (hadiah): QRIS & transfer SeaBank. Kartu hanya tampil kalau aktif DAN datanya terisi
+    //     (QRIS butuh gambar, SeaBank butuh nomor rekening); kalau keduanya tidak tampil, seluruh bagian Gift disembunyikan.
+    'gift_judul'      => 'Wedding Gift',
+    'gift_deskripsi'  => 'Kehadiran dan doa Anda adalah hadiah terbaik bagi kami. Namun jika Anda berkenan memberikan tanda kasih, dapat melalui pilihan berikut.',
+    'gift_qris_aktif' => '1',
+    'gift_qris_judul' => 'QRIS',
+    'gift_qris_nama'  => 'Malik Pratama',            // nama pemilik / merchant (opsional)
+    'gift_qris_foto'  => '',                          // gambar QRIS hasil unggahan (kosong = kartu QRIS tidak tampil)
+    'gift_bank_aktif' => '1',
+    'gift_bank_judul' => 'SeaBank',
+    'gift_bank_nama'  => 'Malik Pratama',            // nama pemilik rekening
+    'gift_bank_nomor' => '1234 5678 9012',            // CONTOH -- ganti dari dashboard sebelum undangan disebar
+
+    // 11. Musik latar (tombol musik di gerbang tamu + tombol melayang di undangan)
+    'musik_aktif'  => '1',
+    'musik_judul'  => '',                             // judul lagu (opsional), tampil di gerbang
+    'musik_file'   => '',                             // file audio hasil unggahan (kosong = fitur musik tidak tampil)
+    'musik_volume' => '60',                           // 5-100
 ];
 
 /** Kunci yang berisi path gambar (di tabel undangan). */
 const UNDANGAN_KUNCI_FOTO = ['cover_foto', 'akad_foto', 'resepsi_foto', 'alamat_foto'];
+
+/** Kunci berkas lain (bukan foto dekorasi): QRIS & musik. Ikut dihapus oleh "Reset semua", tapi TIDAK oleh "Reset gambar". */
+const UNDANGAN_KUNCI_BERKAS = ['gift_qris_foto', 'musik_file'];
 
 const UNDANGAN_ZONA = ['WIB', 'WITA', 'WIT'];
 
@@ -92,6 +114,15 @@ const UNDANGAN_ATURAN_TEKS = [
     'rsvp_deskripsi'     => [false, 400, 'Deskripsi RSVP',             true],
     'ucapan_doa_judul'   => [true,  40,  'Judul Ucapan & Doa',        false],
     'ucapan_kosong'      => [false, 200, 'Teks saat belum ada ucapan', false],
+
+    'gift_judul'         => [true,  40,  'Judul Gift',                 false],
+    'gift_deskripsi'     => [false, 400, 'Deskripsi Gift',             true],
+    'gift_qris_judul'    => [true,  30,  'Judul kartu QRIS',           false],
+    'gift_qris_nama'     => [false, 100, 'Nama pemilik QRIS',          false],
+    'gift_bank_judul'    => [true,  30,  'Nama bank',                  false],
+    'gift_bank_nama'     => [false, 100, 'Nama pemilik rekening',      false],
+
+    'musik_judul'        => [false, 80,  'Judul lagu',                 false],
 ];
 
 /** Aturan teks mempelai (tabel pengantin): kolom => [wajib, panjang maksimal, label]. */
@@ -149,6 +180,37 @@ function url_gambar_aman(string $path, string $cadangan): string
     return preg_match('#^[A-Za-z0-9/_.-]+$#', $path) ? $path : $cadangan;
 }
 
+/** Nomor rekening untuk disalin: hanya angka ("1234 5678 9012" -> "123456789012"). */
+function gift_nomor_polos(string $nomor): string
+{
+    return preg_replace('/\D+/', '', $nomor) ?? '';
+}
+
+/** Kartu QRIS tampil kalau diaktifkan dan gambarnya sudah diunggah. */
+function gift_qris_tampil(array $u): bool
+{
+    return $u['gift_qris_aktif'] === '1' && url_gambar_aman((string) $u['gift_qris_foto'], '') !== '';
+}
+
+/** Kartu SeaBank tampil kalau diaktifkan dan nomor rekeningnya terisi. */
+function gift_bank_tampil(array $u): bool
+{
+    return $u['gift_bank_aktif'] === '1' && gift_nomor_polos((string) $u['gift_bank_nomor']) !== '';
+}
+
+/** Musik tampil kalau diaktifkan dan file audionya sudah diunggah. */
+function musik_tampil(array $u): bool
+{
+    return $u['musik_aktif'] === '1' && url_gambar_aman((string) $u['musik_file'], '') !== '';
+}
+
+/** Volume musik 5-100 (di luar itu dijepit; bukan angka -> 60). */
+function musik_volume(array $u): int
+{
+    $v = (int) ($u['musik_volume'] ?? 60);
+    return $v < 5 ? 5 : min(100, $v);
+}
+
 function jam_valid(string $v): bool
 {
     return (bool) preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $v);
@@ -196,6 +258,25 @@ function validasi_undangan(array $in): array
         if ($u["{$a}_selesai"] !== '' && !jam_valid($u["{$a}_selesai"])) return [[], [], "Jam selesai $nama tidak valid."];
         if (!in_array($u["{$a}_zona"], UNDANGAN_ZONA, true)) return [[], [], "Zona waktu $nama tidak valid."];
     }
+
+    // Gift: saklar aktif/nonaktif (checkbox + hidden "0"), nomor rekening SeaBank.
+    $u['gift_qris_aktif'] = $ambil('gift_qris_aktif') === '1' ? '1' : '0';
+    $u['gift_bank_aktif'] = $ambil('gift_bank_aktif') === '1' ? '1' : '0';
+    $u['gift_bank_nomor'] = preg_replace('/\s+/', ' ', $ambil('gift_bank_nomor'));
+    if ($u['gift_bank_nomor'] !== '' && !preg_match('/^[0-9][0-9 \-]{3,28}[0-9]$/', $u['gift_bank_nomor'])) {
+        return [[], [], 'Nomor rekening hanya boleh berisi angka, spasi, atau tanda hubung (5-30 karakter).'];
+    }
+    if ($u['gift_bank_aktif'] === '1' && $u['gift_bank_nomor'] === '') {
+        return [[], [], 'Nomor rekening wajib diisi kalau kartu transfer diaktifkan.'];
+    }
+
+    // Musik: saklar + volume.
+    $u['musik_aktif'] = $ambil('musik_aktif') === '1' ? '1' : '0';
+    $vol = $ambil('musik_volume');
+    if ($vol === '' || !ctype_digit($vol) || (int) $vol < 5 || (int) $vol > 100) {
+        return [[], [], 'Volume musik harus berupa angka 5 sampai 100.'];
+    }
+    $u['musik_volume'] = (string) (int) $vol;
 
     $m = [];
     foreach (['pria' => 'mempelai pria', 'wanita' => 'mempelai wanita'] as $jenis => $nama) {

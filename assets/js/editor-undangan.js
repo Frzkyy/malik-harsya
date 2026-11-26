@@ -16,7 +16,7 @@
 
     var ASAL = location.origin;
     var MAKS_BYTE = 12 * 1024 * 1024;           // sama dengan UNGGAH_MAKS di includes/upload.php
-    var NAMA_FOTO = ['cover_foto', 'pria_foto', 'wanita_foto', 'akad_foto', 'resepsi_foto', 'alamat_foto'];
+    var NAMA_FOTO = ['cover_foto', 'pria_foto', 'wanita_foto', 'akad_foto', 'resepsi_foto', 'alamat_foto', 'gift_qris_foto'];
 
     var layar = document.getElementById('pv-layar');
     var kanvas = document.getElementById('pv-kanvas');
@@ -52,7 +52,7 @@
         var d = {};
         Array.prototype.forEach.call(form.elements, function (el) {
             if (!el.name || el.type === 'file' || el.type === 'hidden' || el.hasAttribute('data-modul')) return;
-            d[el.name] = el.value;
+            d[el.name] = el.type === 'checkbox' ? (el.checked ? '1' : '0') : el.value;   // checkbox: '1' / '0'
         });
         NAMA_FOTO.forEach(function (n) { d[n] = sumberFoto[n]; });
         modul.forEach(function (m) { Object.assign(d, m.kumpulkan()); });
@@ -130,7 +130,9 @@
         if (blobAktif[nama]) URL.revokeObjectURL(blobAktif[nama]);
         blobAktif[nama] = URL.createObjectURL(f);
         sumberFoto[nama] = blobAktif[nama];
-        wadah.querySelector('.ed-thumb').src = blobAktif[nama];
+        var thumb = wadah.querySelector('.ed-thumb');
+        thumb.src = blobAktif[nama];
+        thumb.hidden = false;
         tandaiKotor();
         jadwalkanKirim();
     });
@@ -147,7 +149,9 @@
         var wadah = form.querySelector('.ed-foto[data-foto="' + nama + '"]');
         if (blobAktif[nama]) { URL.revokeObjectURL(blobAktif[nama]); delete blobAktif[nama]; }
         sumberFoto[nama] = wadah.getAttribute('data-path');
-        wadah.querySelector('.ed-thumb').src = '../' + sumberFoto[nama];
+        var thumb = wadah.querySelector('.ed-thumb');
+        thumb.src = sumberFoto[nama] ? '../' + sumberFoto[nama] : '';
+        thumb.hidden = !sumberFoto[nama];
         jadwalkanKirim();
     }
 
@@ -289,9 +293,25 @@
                     if (!wadah) return;
                     wadah.setAttribute('data-path', d.gambar[nama]);
                     wadah.querySelector('input[type="file"]').value = '';
-                    wadah.querySelector('.ed-thumb').src = '../' + d.gambar[nama];
+                    var th = wadah.querySelector('.ed-thumb');
+                    th.src = '../' + d.gambar[nama];
+                    th.hidden = false;
+                    var hp = wadah.querySelector('.ed-hapus');
+                    if (hp) { hp.hidden = false; hp.querySelector('input[type="checkbox"]').checked = false; }
                     if (blobAktif[nama]) { URL.revokeObjectURL(blobAktif[nama]); delete blobAktif[nama]; }
                     sumberFoto[nama] = d.gambar[nama];
+                });
+                // Berkas yang dihapus (QRIS): path dikosongkan, miniatur disembunyikan.
+                (d.berkas_hapus || []).forEach(function (nama) {
+                    var wadah = form.querySelector('.ed-foto[data-foto="' + nama + '"]');
+                    if (!wadah) return;
+                    wadah.setAttribute('data-path', '');
+                    sumberFoto[nama] = '';
+                    var th = wadah.querySelector('.ed-thumb');
+                    th.removeAttribute('src');
+                    th.hidden = true;
+                    var hp = wadah.querySelector('.ed-hapus');
+                    if (hp) { hp.hidden = true; hp.querySelector('input[type="checkbox"]').checked = false; }
                 });
                 modul.forEach(function (m) { m.setelahSimpan(d); });
                 kotor = false;
