@@ -1,4 +1,11 @@
 <?php
+// Pastikan alamat dashboard diakhiri garis miring
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+if (substr($path, -10) === '/dashboard') {
+    $query = $_SERVER['QUERY_STRING'] ?? '';
+    header('Location: ' . $path . '/' . ($query !== '' ? '?' . $query : ''));
+    exit;
+}
 // Dashboard admin: layout + sidebar. Isi tiap panel ada di dashboard/panel/<nama>.php.
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';

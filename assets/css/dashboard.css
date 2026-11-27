@@ -534,3 +534,176 @@ input:focus-visible, textarea:focus-visible, .tombol:focus-visible, button:focus
         min-width: 120px;
     }
 }
+
+/* ===== Tema navy & emas ===== */
+
+/* Latar halaman */
+body.dash {
+    color: #efe8d6;
+    background:
+        linear-gradient(90deg, #b08d57, #e3cfa4 50%, #b08d57) top / 100% 4px no-repeat,
+        radial-gradient(circle at 90% 0, rgba(176, 141, 87, 0.16) 0, transparent 40%),
+        linear-gradient(165deg, #22334f 0%, #16233a 100%);
+    background-attachment: fixed;
+}
+
+/* Sidebar */
+.sisi {
+    border-top: 3px solid #b08d57;
+    background: linear-gradient(180deg, #1b2a41 0%, #121e32 100%);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.3);
+}
+.sisi nav a {
+    border-left: 3px solid rgba(176, 141, 87, 0.5);
+    background: rgba(255, 255, 255, 0.06);
+    color: #efe8d6;
+    transition: background 0.15s, border-color 0.15s;
+}
+.sisi nav a:hover { background: rgba(176, 141, 87, 0.18); border-left-color: #b08d57; }
+.sisi nav a.aktif { background: linear-gradient(90deg, #b08d57, #cfb27c); border-left-color: #e3cfa4; color: #14213a; }
+.sisi nav a.kembali { border: 1px solid rgba(176, 141, 87, 0.6); background: none; color: #e3cfa4; }
+
+/* Info akun */
+.akun { color: #c9c2b0; }
+.role { border-color: #b08d57; color: #e3cfa4; }
+.tombol-teks { color: #e3cfa4; }
+
+/* Banner judul */
+.isi > h1 {
+    position: relative;
+    overflow: hidden;
+    margin: 0 0 14px;
+    padding: 26px 110px 34px;
+    border: 1px solid #b08d57;
+    border-radius: var(--r);
+    background:
+        url("../../media/ornamen-sudut-1.png") left 8px top 0 / 92px no-repeat,
+        linear-gradient(180deg, #ffffff 0%, #f8f6f0 100%);
+    box-shadow: 0 4px 14px rgba(27, 42, 65, 0.08);
+    color: #1b2a41;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
+/* Ornamen sudut kanan bawah */
+.isi > h1::before {
+    content: "";
+    position: absolute;
+    right: 8px;
+    bottom: 0;
+    width: 92px;
+    height: 92px;
+    background: url("../../media/ornamen-sudut-1.png") center / contain no-repeat;
+    transform: rotate(180deg);
+}
+
+/* Ornamen di bawah judul */
+.isi > h1::after {
+    content: "";
+    display: block;
+    width: 220px;
+    height: 20px;
+    margin: 6px auto 0;
+    background: url("../../media/ornamen-lurus-tengah-1.png") center / contain no-repeat;
+}
+
+/* Teks di atas latar navy */
+.isi .petunjuk, .isi > p, .isi > .kosong { color: #d9d2bf; }
+
+/* Kartu */
+.kartu,
+.editor .bagian {
+    border: 1px solid rgba(176, 141, 87, 0.45);
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+    color: #1d2733;
+}
+.grid-pengantin .kartu,
+.kartu:nth-child(even) { border-top: 3px solid #b08d57; }
+.kartu .kepala { padding-bottom: 10px; border-bottom: 1px solid #e8dcc0; }
+.kartu .petunjuk, .kartu p { color: #3d4654; }
+
+/* Judul kartu dan label profil */
+.kepala h2, .kepala h3, .profil dt {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 700;
+}
+.kepala h2, .kepala h3 { color: #1b2a41; font-size: 22px; }
+.profil dt { color: #26385a; font-size: 17px; }
+
+/* Foto profil */
+.profil .foto img {
+    padding: 3px;
+    border: 1px solid #b08d57;
+    background: #fff;
+}
+
+/* Badge jumlah */
+.hitung { background: #efe6d6; color: #7a5f35; }
+
+/* Editor undangan */
+.editor .bagian .no { background: #1b2a41; box-shadow: 0 0 0 3px #efe6d6; }
+.editor .bagian[open] { border-left: 3px solid #b08d57; }
+.ed-bar { border-top: 2px solid #b08d57; }
+
+/* Tombol */
+.tombol { transition: background 0.15s, border-color 0.15s; }
+
+.tombol:not(.utama):not(.btn-bahaya) {
+    border: 1px solid #b08d57;
+    background: #fff;
+    color: #1b2a41;
+}
+.tombol:not(.utama):not(.btn-bahaya):hover { background: #f4ecd9; }
+
+.tombol.utama {
+    border: 1px solid #b08d57;
+    background: linear-gradient(180deg, #26385a 0%, #1b2a41 100%);
+    box-shadow: 0 3px 10px rgba(27, 42, 65, 0.3);
+    color: #fff;
+}
+.tombol.utama:hover { border-color: #e3cfa4; background: linear-gradient(180deg, #2f4570 0%, #223454 100%); }
+
+/* Tombol emas: reset, kelola admin, tamu, filter */
+.tombol.btn-bahaya,
+.tombol.utama[href="kelola.php"],
+.tombol-biru,
+.tombol-ungu {
+    border: 1px solid #8a6a3a;
+    background: linear-gradient(180deg, #d8bd86 0%, #b08d57 55%, #9a7845 100%);
+    box-shadow: 0 3px 10px rgba(176, 141, 87, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    color: #14213a;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+.tombol.btn-bahaya:hover,
+.tombol.utama[href="kelola.php"]:hover,
+.tombol-biru:hover,
+.tombol-ungu:hover {
+    border-color: #6f5328;
+    background: linear-gradient(180deg, #e6cd9a 0%, #c19d63 55%, #a98450 100%);
+}
+
+/* Input file */
+.unggah input[type="file"] { width: 270px; max-width: 100%; }
+
+input[type="file"]::file-selector-button {
+    margin-right: 10px;
+    padding: 5px 14px;
+    border: 1px solid #8a6a3a;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #d8bd86 0%, #b08d57 55%, #9a7845 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    color: #14213a;
+    font: 700 13px system-ui, sans-serif;
+    cursor: pointer;
+}
+input[type="file"]::file-selector-button:hover {
+    background: linear-gradient(180deg, #e6cd9a 0%, #c19d63 55%, #a98450 100%);
+}
+
+/* Filter daftar hadir */
+.filter-hadir label { color: #efe8d6; font-weight: 700; }
