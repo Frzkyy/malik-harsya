@@ -1637,6 +1637,113 @@ body.terkunci {
     }
 }
 
+/* Responsif: Gift & Musik (HP -> tablet -> desktop). Ditaruh di sini agar menimpa aturan dasar di atas. */
+
+#gift {
+    padding: clamp(var(--s5), 12vw, var(--s7)) var(--pad) calc(var(--s6) + env(safe-area-inset-bottom, 0px));
+}
+
+#gift h1 {
+    overflow-wrap: anywhere;
+}
+
+#gift .ornamen-gift {
+    width: clamp(120px, 40vw, 200px);
+    max-width: none;
+}
+
+/* Kartu: 1 kolom di HP, 2 kolom bila cukup lebar; tinggi mengikuti isi (tidak dipaksa sama) */
+.gift-daftar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17em), 24em));
+    align-items: start;
+    justify-content: center;
+    gap: var(--s4);
+}
+
+.gift-kartu {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    box-sizing: border-box;
+}
+
+.gift-kartu h2,
+.gift-pemilik {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.gift-qr {
+    max-width: min(260px, 100%);
+}
+
+.gift-nomor {
+    box-sizing: border-box;
+    font-size: clamp(1rem, 5.2vw, var(--f2));
+    letter-spacing: clamp(.02em, .6vw, .08em);
+}
+
+.gift-kartu .btn,
+.gift-kartu button {
+    min-height: 44px;
+    max-width: 100%;
+}
+
+/* Tombol musik di gerbang: boleh turun baris, tidak melebihi layar */
+#gerbang .gerbang-musik {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-height: 44px;
+    border-radius: 22px;
+}
+
+.gerbang-musik-teks {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+    .gift-daftar {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--s3);
+    }
+
+    .gift-kartu {
+        padding: var(--s3) var(--s2);
+    }
+
+    .gift-kartu .btn,
+    .gift-kartu button {
+        width: 100%;
+        max-width: 20em;
+    }
+
+    #gift > p {
+        margin-bottom: var(--s4);
+    }
+
+    .musik-tombol {
+        right: max(var(--s2), env(safe-area-inset-right, 0px));
+        bottom: max(var(--s2), env(safe-area-inset-bottom, 0px));
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (min-width: 1100px) {
+    .gift-daftar {
+        max-width: 56em;
+    }
+
+    .musik-tombol {
+        right: var(--s4);
+        bottom: var(--s4);
+        width: 56px;
+        height: 56px;
+    }
+}
+
 [hidden] {
     display: none !important;
 }
